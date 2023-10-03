@@ -1,0 +1,7 @@
+{
+    "name": "firejs-app",
+    "version": "1.0.0",
+    "dependencies": {
+        "firejs": "1.0.0"
+    }
+}

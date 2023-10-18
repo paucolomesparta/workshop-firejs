@@ -1,7 +1,12 @@
-import isPropValid from '@emotion/is-prop-valid'
-
 import { DOMElement, Fiber, FireElementType, JSXElement, Props } from './types'
 import { deletions, nextUnitOfWork, wipRoot } from './globals'
+import {
+	getEventListenerKey,
+	getPropAttr,
+	isEventListener,
+	isPropValid,
+	shouldSkipProp,
+} from './attrs'
 
 function createTextNode(text: string): JSXElement {
 	return { type: 'TEXT_NODE', props: { nodeValue: text, children: [] } }
@@ -37,16 +42,6 @@ export function cloneElement(element: JSXElement): JSXElement {
 	}
 }
 
-const eventListenerRegex = /on([A-Z]{0,1}[a-z]+)/gm
-
-function isEventListener(key: string) {
-	return eventListenerRegex.test(key)
-}
-
-function getEventListenerKey(key: string) {
-	return key.match(eventListenerRegex)[0].toLowerCase()
-}
-
 export function createDOMElement(element: Fiber): DOMElement {
 	if (typeof element === 'string') {
 		return document.createTextNode(element)
@@ -58,23 +53,7 @@ export function createDOMElement(element: Fiber): DOMElement {
 
 	const node = document.createElement(element.type)
 
-	if (element.props && Object.keys(element.props).length > 0) {
-		for (const [key, value] of Object.entries(element.props)) {
-			if (key === 'children') {
-				continue
-			}
-
-			if (isEventListener(key)) {
-				const domAttr = getEventListenerKey(key)
-
-				node.addEventListener(domAttr, value)
-			} else if (isPropValid(key)) {
-				node.setAttribute(key, value.toString())
-			} else {
-				node[key] = value
-			}
-		}
-	}
+	updateDOMElement(node, {}, element.props)
 
 	return node
 }
@@ -87,16 +66,16 @@ export function updateDOMElement(
 	// eliminar o cambiar props viejas
 	for (const [key, value] of Object.entries(prevProps)) {
 		if (
-			key === 'children' ||
+			shouldSkipProp(key) ||
 			(key in nextProps && prevProps[key] === nextProps[key])
 		) {
 			continue
 		}
 
-		if (isEventListener(key)) {
-			const domAttr = getEventListenerKey(key)
+		const attr = getPropAttr(key)
 
-			dom.removeEventListener(domAttr, value)
+		if (isEventListener(key)) {
+			dom.removeEventListener(attr, value)
 		} else if (isPropValid(key) && dom instanceof HTMLElement) {
 			dom.removeAttribute(key)
 		} else {
@@ -106,7 +85,7 @@ export function updateDOMElement(
 
 	// añadir nuevas props
 	for (const [key, value] of Object.entries(nextProps)) {
-		if (key === 'children' || prevProps[key] === nextProps[key]) {
+		if (shouldSkipProp(key) || prevProps[key] === nextProps[key]) {
 			continue
 		}
 

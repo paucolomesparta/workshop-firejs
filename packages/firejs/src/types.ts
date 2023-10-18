@@ -17,7 +17,7 @@ export interface FunctionComponent<P extends Props = Props> {
 export function isFunctionComponent<P extends Props = Props>(
 	element: FireElementType,
 ): element is FunctionComponent<P> {
-	return typeof element === "function";
+	return element instanceof Function;
 }
 
 export type RefObject<T> = {

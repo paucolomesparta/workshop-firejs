@@ -1,6 +1,14 @@
-import fire from "firejs";
-import App from "./app";
+import { createElement, render, useState } from "firejs";
 
 const container = document.getElementById("root");
 
-fire.render(fire.createElement("div", {}), container);
+function App() {
+	const [val, setVal] = useState("hola");
+
+	return createElement("input", {
+		onChange: e => setVal(e.target.value),
+		value: val,
+	});
+}
+
+render(createElement(App, {}), container);

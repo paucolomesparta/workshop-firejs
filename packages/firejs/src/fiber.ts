@@ -1,6 +1,11 @@
 import { createDOMElement, updateDOMElement } from "./vdom";
 
-import { isFunctionComponent, type Fiber, type JSXElement } from "./types";
+import {
+	isFunctionComponent,
+	type Fiber,
+	type JSXElement,
+	DOMElement,
+} from "./types";
 import { currentRoot, deletions, nextUnitOfWork, wipRoot } from "./globals";
 
 /**
@@ -45,7 +50,7 @@ export function commitWork(fiber: Fiber | null) {
 }
 
 /**
- * Bucle que programa las unidades de trabaho para ser ejecutadas cuando el navegador está inactivo.
+ * Bucle que programa las unidades de trabajo para ser ejecutadas cuando el navegador está inactivo.
  * Si se cumple la deadline se cede el trabajo hasta el siguiente tiempo inactivo.
  */
 export function workLoop(deadline: IdleDeadline) {
@@ -63,11 +68,6 @@ export function workLoop(deadline: IdleDeadline) {
 
 	requestIdleCallback(workLoop);
 }
-
-/**
- * empieza el bucle
- */
-requestIdleCallback(workLoop);
 
 /**
  * Realizar unidad de trabajo actual

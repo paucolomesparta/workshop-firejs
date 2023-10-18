@@ -14,6 +14,7 @@ import {
 	isPropValid,
 	shouldSkipProp,
 } from "./attrs";
+import { workLoop } from "./fiber";
 
 function textNodeFactory(text: string): JSXElement {
 	return { type: "TEXT_NODE", props: { nodeValue: text, children: [] } };
@@ -55,7 +56,8 @@ export function createDOMElement(fiber: Fiber): DOMElement {
 	const dom =
 		fiber.type == "TEXT_NODE"
 			? document.createTextNode("")
-			: document.createElement(fiber.type);
+			: // @ts-ignore
+			  document.createElement(fiber.type);
 
 	updateDOMElement(dom, {}, fiber.props);
 
@@ -105,9 +107,6 @@ export function updateDOMElement(
 	}
 }
 
-export const typeofJsxElement = (element: JSXElement): FireElementType =>
-	typeof element === "string" ? "TEXT_NODE" : element.type;
-
 export function render(element: JSXElement, container: HTMLElement | Text) {
 	wipRoot.current = {
 		dom: container,
@@ -120,4 +119,6 @@ export function render(element: JSXElement, container: HTMLElement | Text) {
 	nextUnitOfWork.current = wipRoot.current;
 
 	deletions.current = [];
+
+	requestIdleCallback(workLoop);
 }

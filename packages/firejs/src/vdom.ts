@@ -37,6 +37,16 @@ export function cloneElement(element: JSXElement): JSXElement {
 	}
 }
 
+const eventListenerRegex = /on([A-Z]{0,1}[a-z]+)/gm
+
+function isEventListener(key: string) {
+	return eventListenerRegex.test(key)
+}
+
+function getEventListenerKey(key: string) {
+	return key.match(eventListenerRegex)[0].toLowerCase()
+}
+
 export function createDOMElement(element: Fiber): DOMElement {
 	if (typeof element === 'string') {
 		return document.createTextNode(element)
@@ -48,23 +58,16 @@ export function createDOMElement(element: Fiber): DOMElement {
 
 	const node = document.createElement(element.type)
 
-	const eventListenerRegex = /on([A-Z]{0,1}[a-z]+)/gm
-
 	if (element.props && Object.keys(element.props).length > 0) {
 		for (const [key, value] of Object.entries(element.props)) {
 			if (key === 'children') {
 				continue
 			}
 
-			const isEventListener = eventListenerRegex.test(key)
+			if (isEventListener(key)) {
+				const domAttr = getEventListenerKey(key)
 
-			if (isEventListener) {
-				const eventListenerKey = key.replace(
-					eventListenerRegex,
-					(_, eventName) => eventName.toLowerCase()
-				)
-
-				node.addEventListener(eventListenerKey, value)
+				node.addEventListener(domAttr, value)
 			} else if (isPropValid(key)) {
 				node.setAttribute(key, value.toString())
 			} else {
@@ -73,13 +76,50 @@ export function createDOMElement(element: Fiber): DOMElement {
 		}
 	}
 
-	// if (element.props.children) {
-	// 	for (const child of element.props.children) {
-	// 		node.appendChild(createHTMLNode(child))
-	// 	}
-	// }
-
 	return node
+}
+
+export function updateDOMElement(
+	dom: DOMElement,
+	prevProps: Props,
+	nextProps: Props
+) {
+	// eliminar o cambiar props viejas
+	for (const [key, value] of Object.entries(prevProps)) {
+		if (
+			key === 'children' ||
+			(key in nextProps && prevProps[key] === nextProps[key])
+		) {
+			continue
+		}
+
+		if (isEventListener(key)) {
+			const domAttr = getEventListenerKey(key)
+
+			dom.removeEventListener(domAttr, value)
+		} else if (isPropValid(key) && dom instanceof HTMLElement) {
+			dom.removeAttribute(key)
+		} else {
+			dom[key] = ''
+		}
+	}
+
+	// añadir nuevas props
+	for (const [key, value] of Object.entries(nextProps)) {
+		if (key === 'children' || prevProps[key] === nextProps[key]) {
+			continue
+		}
+
+		if (isEventListener(key)) {
+			const domAttr = getEventListenerKey(key)
+
+			dom.addEventListener(domAttr, value)
+		} else if (isPropValid(key) && dom instanceof HTMLElement) {
+			dom.setAttribute(key, value.toString())
+		} else {
+			dom[key] = value
+		}
+	}
 }
 
 export const typeofJsxElement = (element: JSXElement): FireElementType =>
@@ -99,12 +139,4 @@ export function render(element: JSXElement, container: HTMLElement | Text) {
 	nextUnitOfWork.current = wipRoot.current
 
 	deletions.current = []
-
-	// const node = createDOMElement(element)
-
-	// for (const child of element.props.children) {
-	// 	render(child, node)
-	// }
-
-	// container.appendChild(node)
 }

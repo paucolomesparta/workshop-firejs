@@ -1,4 +1,4 @@
-import { createDOMElement } from './vdom'
+import { createDOMElement, updateDOMElement } from './vdom'
 
 import type { Fiber, JSXElement } from './types'
 import { currentRoot, deletions, nextUnitOfWork, wipRoot } from './globals'
@@ -21,8 +21,20 @@ export function commitWork(fiber: Fiber | null) {
 
 	const domParent = fiber.parent?.dom
 
-	if (fiber.dom && domParent) {
-		domParent.appendChild(fiber.dom)
+	switch (fiber.effectTag) {
+		case 'CREATE':
+			if (fiber.dom) {
+				domParent?.appendChild(fiber.dom)
+			}
+			break
+		case 'UPDATE':
+			if (fiber.dom) {
+				updateDOMElement(fiber.dom, fiber.alternate?.props, fiber.props)
+			}
+			break
+		case 'DELETE':
+			domParent?.removeChild(fiber.dom!)
+			break
 	}
 
 	commitWork(fiber.child)
@@ -111,12 +123,12 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 
 		// si es primer hijo se asigna al child del fiber padre
 		if (index === 0) {
-			wipFiber.child = childFiber
+			wipFiber.child = newFiber
 		} else {
 			// si no es el primer hijo se asigna al sibling del ultimo hijo
-			wipFiber.sibling = childFiber
+			wipFiber.sibling = newFiber
 		}
 
-		prevSibling = childFiber
+		prevSibling = newFiber
 	}
 }

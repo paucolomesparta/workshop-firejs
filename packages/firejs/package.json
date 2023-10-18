@@ -4,7 +4,8 @@
 	"description": "React-like reactive web framework for the modern web",
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "tsc --build ."
+		"build": "tsc --build .",
+		"build:watch": "tsc --build . --watch"
 	},
 	"dependencies": {
 		"@emotion/is-prop-valid": "^1.2.1",

@@ -1,7 +1,7 @@
 import {
 	DOMElement,
-	DOMElementKeys,
 	Fiber,
+	FireElement,
 	FireElementType,
 	JSXElement,
 	Props,
@@ -19,18 +19,33 @@ function textNodeFactory(text: string): JSXElement {
 	return { type: "TEXT_NODE", props: { nodeValue: text, children: [] } };
 }
 
-export function createElement<P extends Props>(
-	type: DOMElementKeys,
+function functionalComponentFactory<P extends Props>(
+	type: Function,
 	props: P,
-	...children: JSXElement[]
+): JSXElement<P> {
+	return { type, props: { ...props, children: [] } };
+}
+
+export function createElement<P extends Props>(
+	type: FireElementType,
+	props: P,
+	...children: FireElement[]
 ): JSXElement<P> {
 	return {
 		type,
 		props: {
 			...props,
-			children: children?.map(child =>
-				typeof child === "string" ? textNodeFactory(child) : child,
-			),
+			children: children?.filter(Boolean).map(child => {
+				if (typeof child === "string") {
+					return textNodeFactory(child);
+				}
+
+				if (typeof child === "function") {
+					return functionalComponentFactory(child, props);
+				}
+
+				return child;
+			}),
 		},
 	};
 }

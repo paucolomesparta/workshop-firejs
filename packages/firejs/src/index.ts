@@ -1,3 +1,4 @@
+import "./fiber";
 import { createElement, render } from "./vdom";
 
 const FireJS = {

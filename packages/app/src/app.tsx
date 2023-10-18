@@ -1,6 +1,5 @@
-import { Component, render } from "firejs";
+import fire from "firejs";
 
-// @jsx
-function App() {
-	return <div>Hello World</div>;
+export default function App() {
+	return fire.createElement("div", null, "Hello World");
 }

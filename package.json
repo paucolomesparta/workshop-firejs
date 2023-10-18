@@ -6,7 +6,8 @@
 	"private": true,
 	"scripts": {
 		"build": "yarn workspaces run build",
-		"lint": "prettier --write ."
+		"lint": "prettier --write .",
+		"dev": "yarn workspace app run dev"
 	},
 	"workspaces": [
 		"packages/*"

@@ -19,13 +19,6 @@ function textNodeFactory(text: string): JSXElement {
 	return { type: "TEXT_NODE", props: { nodeValue: text, children: [] } };
 }
 
-function functionalComponentFactory<P extends Props>(
-	type: Function,
-	props: P,
-): JSXElement<P> {
-	return { type, props: { ...props, children: [] } };
-}
-
 export function createElement<P extends Props>(
 	type: FireElementType,
 	props: P,
@@ -35,17 +28,11 @@ export function createElement<P extends Props>(
 		type,
 		props: {
 			...props,
-			children: children?.filter(Boolean).map(child => {
-				if (typeof child === "string") {
-					return textNodeFactory(child);
-				}
-
-				if (typeof child === "function") {
-					return functionalComponentFactory(child, props);
-				}
-
-				return child;
-			}),
+			children: children
+				?.filter(Boolean)
+				.map(child =>
+					typeof child === "string" ? textNodeFactory(child) : child,
+				),
 		},
 	};
 }
@@ -64,20 +51,15 @@ export function cloneElement(element: JSXElement): JSXElement {
 	};
 }
 
-export function createDOMElement(element: Fiber): DOMElement {
-	if (typeof element === "string") {
-		return document.createTextNode(element);
-	}
+export function createDOMElement(fiber: Fiber): DOMElement {
+	const dom =
+		fiber.type == "TEXT_NODE"
+			? document.createTextNode("")
+			: document.createElement(fiber.type);
 
-	if (typeof element.type === "function") {
-		return;
-	}
+	updateDOMElement(dom, {}, fiber.props);
 
-	const node = document.createElement(element.type);
-
-	updateDOMElement(node, {}, element.props);
-
-	return node;
+	return dom;
 }
 
 export function updateDOMElement(
@@ -128,11 +110,9 @@ export const typeofJsxElement = (element: JSXElement): FireElementType =>
 
 export function render(element: JSXElement, container: HTMLElement | Text) {
 	wipRoot.current = {
-		type: typeof element === "string" ? element : element.type,
 		dom: container,
 		props: {
 			children: [element],
-			nodeValue: typeof element === "string" ? element : undefined,
 		},
 		alternate: wipRoot.current,
 	};

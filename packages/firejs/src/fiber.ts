@@ -98,7 +98,9 @@ export function performUnitOfWork(fiber: Fiber): Fiber | null {
  * Actualiza el componente funcional pasando el JSXElement como children y reconciliando los hijos de la unidad de trabajo
  */
 function updateFunctionComponent(fiber: Fiber) {
-	const children = [(fiber.type as Function)(fiber.props)];
+	if (!isFunctionComponent(fiber.type)) return;
+
+	const children = [fiber.type(fiber.props)];
 
 	reconcileChildren(fiber, children);
 }

@@ -3,7 +3,7 @@ export type Props = Record<string, any>;
 export type DOMElement = HTMLElement | Text;
 export type DOMElementKeys = keyof HTMLElementTagNameMap;
 export type FireElementType = DOMElementKeys | Function | "TEXT_NODE";
-export type FireElement = string | Function | null | undefined;
+export type FireElement = string | JSXElement;
 
 export type JSXElement<P extends Props = Props> = {
 	type: FireElementType;
@@ -11,7 +11,7 @@ export type JSXElement<P extends Props = Props> = {
 };
 
 export interface FunctionComponent<P extends Props = Props> {
-	(props: P): FireElement;
+	(props: P): JSXElement;
 }
 
 export function isFunctionComponent<P extends Props = Props>(

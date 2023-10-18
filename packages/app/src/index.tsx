@@ -3,4 +3,4 @@ import App from "./app";
 
 const container = document.getElementById("root");
 
-fire.render(fire.createElement(App, {}), container);
+fire.render(fire.createElement("div", {}), container);

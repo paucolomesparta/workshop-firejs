@@ -24,8 +24,13 @@ export type RefObject<T> = {
 	current: T | null
 }
 
+export type Hook = {
+	state: any
+	queue: any[]
+}
+
 export type Fiber = {
-	type: FireElementType
+	type?: FireElementType
 	props: Props & { children: JSXElement[]; nodeValue?: string }
 	dom: DOMElement
 	parent?: Fiber
@@ -33,4 +38,5 @@ export type Fiber = {
 	sibling?: Fiber
 	alternate?: Fiber // link to old fiber
 	effectTag?: 'CREATE' | 'UPDATE' | 'DELETE'
+	hooks?: Hook[]
 }

@@ -31,6 +31,6 @@ export type Fiber = {
 	parent?: Fiber
 	child?: Fiber
 	sibling?: Fiber
-	alternate?: Fiber
+	alternate?: Fiber // link to old fiber
 	effectTag?: 'CREATE' | 'UPDATE' | 'DELETE'
 }

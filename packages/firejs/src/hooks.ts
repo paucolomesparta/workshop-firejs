@@ -5,40 +5,40 @@ import {
 	nextUnitOfWork,
 	wipFiber,
 	wipRoot,
-} from './globals'
-import { Hook } from './types'
+} from "./globals";
+import { Hook } from "./types";
 
 export function useState<T, SetStateAction = { (value: T): T }>(
-	initialState?: T
+	initialState?: T,
 ): [T, (action: SetStateAction) => void] {
-	const oldHook = wipFiber.current?.hooks?.[hookIndex.current]
+	const oldHook = wipFiber.current?.hooks?.[hookIndex.current];
 	const hook: Hook = {
 		state: oldHook ? oldHook.state : initialState,
 		queue: [],
-	}
+	};
 
-	const actions = oldHook ? oldHook.queue : []
+	const actions = oldHook ? oldHook.queue : [];
 
 	for (const action of actions) {
-		hook.state = action(hook.state)
+		hook.state = action(hook.state);
 	}
 
 	const setState = (action: SetStateAction) => {
-		hook.queue.push(action)
+		hook.queue.push(action);
 
 		wipRoot.current = {
 			dom: currentRoot.current.dom,
 			props: currentRoot.current.props,
 			alternate: currentRoot.current,
-		}
+		};
 
-		nextUnitOfWork.current = wipRoot.current
+		nextUnitOfWork.current = wipRoot.current;
 
-		deletions.current = []
-	}
+		deletions.current = [];
+	};
 
-	wipFiber.current.hooks.push(hook)
-	hookIndex.current++
+	wipFiber.current.hooks.push(hook);
+	hookIndex.current++;
 
-	return [hook.state, setState]
+	return [hook.state, setState];
 }

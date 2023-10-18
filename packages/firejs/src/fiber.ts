@@ -1,17 +1,17 @@
-import { createDOMElement, updateDOMElement } from './vdom'
+import { createDOMElement, updateDOMElement } from "./vdom";
 
-import { isFunctionComponent, type Fiber, type JSXElement } from './types'
-import { currentRoot, deletions, nextUnitOfWork, wipRoot } from './globals'
+import { isFunctionComponent, type Fiber, type JSXElement } from "./types";
+import { currentRoot, deletions, nextUnitOfWork, wipRoot } from "./globals";
 
 /**
  * Sincroniza la raíz actual con el DOM
  */
 export function commitRoot() {
-	deletions.current?.forEach(commitWork)
+	deletions.current?.forEach(commitWork);
 
-	commitWork(wipRoot.current.child)
-	currentRoot.current = wipRoot.current
-	wipRoot.current = null
+	commitWork(wipRoot.current.child);
+	currentRoot.current = wipRoot.current;
+	wipRoot.current = null;
 }
 
 /**
@@ -19,29 +19,29 @@ export function commitRoot() {
  */
 export function commitWork(fiber: Fiber | null) {
 	if (!fiber) {
-		return
+		return;
 	}
 
-	const domParent = fiber.parent?.dom
+	const domParent = fiber.parent?.dom;
 
 	switch (fiber.effectTag) {
-		case 'CREATE':
+		case "CREATE":
 			if (fiber.dom) {
-				domParent?.appendChild(fiber.dom)
+				domParent?.appendChild(fiber.dom);
 			}
-			break
-		case 'UPDATE':
+			break;
+		case "UPDATE":
 			if (fiber.dom) {
-				updateDOMElement(fiber.dom, fiber.alternate?.props, fiber.props)
+				updateDOMElement(fiber.dom, fiber.alternate?.props, fiber.props);
 			}
-			break
-		case 'DELETE':
-			domParent?.removeChild(fiber.dom!)
-			break
+			break;
+		case "DELETE":
+			domParent?.removeChild(fiber.dom!);
+			break;
 	}
 
-	commitWork(fiber.child)
-	commitWork(fiber.sibling)
+	commitWork(fiber.child);
+	commitWork(fiber.sibling);
 }
 
 /**
@@ -49,48 +49,48 @@ export function commitWork(fiber: Fiber | null) {
  * Si se cumple la deadline se cede el trabajo hasta el siguiente tiempo inactivo.
  */
 export function workLoop(deadline: IdleDeadline) {
-	let shouldYield = false
+	let shouldYield = false;
 
 	while (nextUnitOfWork.current && !shouldYield) {
-		nextUnitOfWork.current = performUnitOfWork(nextUnitOfWork.current)
+		nextUnitOfWork.current = performUnitOfWork(nextUnitOfWork.current);
 
-		shouldYield = deadline.timeRemaining() < 1
+		shouldYield = deadline.timeRemaining() < 1;
 	}
 
 	if (!nextUnitOfWork.current && wipRoot.current) {
-		commitRoot()
+		commitRoot();
 	}
 
-	requestIdleCallback(workLoop)
+	requestIdleCallback(workLoop);
 }
 
 /**
  * empieza el bucle
  */
-requestIdleCallback(workLoop)
+requestIdleCallback(workLoop);
 
 /**
  * Realizar unidad de trabajo actual
  */
 export function performUnitOfWork(fiber: Fiber): Fiber | null {
 	if (isFunctionComponent(fiber.type)) {
-		updateFunctionComponent(fiber)
+		updateFunctionComponent(fiber);
 	} else {
-		updateHostComponent(fiber)
+		updateHostComponent(fiber);
 	}
 
 	if (fiber.child) {
-		return fiber.child
+		return fiber.child;
 	}
 
-	let nextFiber: Fiber | null = fiber
+	let nextFiber: Fiber | null = fiber;
 
 	while (nextFiber) {
 		if (nextFiber.sibling) {
-			return nextFiber.sibling
+			return nextFiber.sibling;
 		}
 
-		nextFiber = nextFiber.parent
+		nextFiber = nextFiber.parent;
 	}
 }
 
@@ -98,9 +98,9 @@ export function performUnitOfWork(fiber: Fiber): Fiber | null {
  * Actualiza el componente funcional pasando el JSXElement como children y reconciliando los hijos de la unidad de trabajo
  */
 function updateFunctionComponent(fiber: Fiber) {
-	const children = [(fiber.type as Function)(fiber.props)]
+	const children = [(fiber.type as Function)(fiber.props)];
 
-	reconcileChildren(fiber, children)
+	reconcileChildren(fiber, children);
 }
 
 /**
@@ -108,26 +108,26 @@ function updateFunctionComponent(fiber: Fiber) {
  */
 function updateHostComponent(fiber: Fiber) {
 	if (!fiber.dom) {
-		fiber.dom = createDOMElement(fiber)
+		fiber.dom = createDOMElement(fiber);
 	}
 
-	reconcileChildren(fiber, fiber.props.children)
+	reconcileChildren(fiber, fiber.props.children);
 }
 
 /**
  * Reconcilia los hijos del fiber, cambiando el tipo de Fiber según estado
  */
 function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
-	let index = 0
-	let oldFiber = wipFiber.alternate?.child
-	let prevSibling = null
+	let index = 0;
+	let oldFiber = wipFiber.alternate?.child;
+	let prevSibling = null;
 
 	while (index < elements.length || oldFiber != null) {
-		const element = elements[index]
+		const element = elements[index];
 
-		let newFiber: Fiber | null = null
+		let newFiber: Fiber | null = null;
 
-		const isSameType = oldFiber && element && element.type === oldFiber.type
+		const isSameType = oldFiber && element && element.type === oldFiber.type;
 
 		// actualizar el nodo
 		if (isSameType) {
@@ -137,8 +137,8 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 				dom: oldFiber!.dom,
 				parent: wipFiber,
 				alternate: oldFiber,
-				effectTag: 'UPDATE',
-			}
+				effectTag: "UPDATE",
+			};
 		}
 
 		if (element && !isSameType) {
@@ -148,22 +148,22 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 				dom: null,
 				parent: wipFiber,
 				alternate: null,
-				effectTag: 'CREATE',
-			}
+				effectTag: "CREATE",
+			};
 		}
 
 		if (oldFiber && !isSameType) {
-			oldFiber.effectTag = 'DELETE'
+			oldFiber.effectTag = "DELETE";
 		}
 
 		// si es primer hijo se asigna al child del fiber padre
 		if (index === 0) {
-			wipFiber.child = newFiber
+			wipFiber.child = newFiber;
 		} else {
 			// si no es el primer hijo se asigna al sibling del ultimo hijo
-			wipFiber.sibling = newFiber
+			wipFiber.sibling = newFiber;
 		}
 
-		prevSibling = newFiber
+		prevSibling = newFiber;
 	}
 }

@@ -1,14 +1,18 @@
 {
-  "name": "chapter-firejs",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "build": "yarn workspaces run build"
-  },
-  "workspaces": [
-    "packages/*"
-  ],
-  "packageManager": "yarn@3.6.4"
+	"name": "chapter-firejs",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"private": true,
+	"scripts": {
+		"build": "yarn workspaces run build",
+		"lint": "prettier --write ."
+	},
+	"workspaces": [
+		"packages/*"
+	],
+	"packageManager": "yarn@3.6.4",
+	"dependencies": {
+		"prettier": "^3.0.3"
+	}
 }

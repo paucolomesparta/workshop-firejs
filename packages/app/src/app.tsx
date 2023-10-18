@@ -1,6 +1,6 @@
-import {Component, render} from 'firejs'
+import { Component, render } from "firejs";
 
-// @jsx 
+// @jsx
 function App() {
-  return <div>Hello World</div>
+	return <div>Hello World</div>;
 }

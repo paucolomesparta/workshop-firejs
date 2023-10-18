@@ -14,6 +14,12 @@ export interface FunctionComponent<P extends Props = Props> {
 	(props: P): FireElement
 }
 
+export function isFunctionComponent<P extends Props = Props>(
+	element: FireElementType
+): element is FunctionComponent<P> {
+	return typeof element === 'function'
+}
+
 export type RefObject<T> = {
 	current: T | null
 }

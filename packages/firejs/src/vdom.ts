@@ -15,7 +15,7 @@ import {
 	shouldSkipProp,
 } from './attrs'
 
-function createTextNode(text: string): JSXElement {
+function textNodeFactory(text: string): JSXElement {
 	return { type: 'TEXT_NODE', props: { nodeValue: text, children: [] } }
 }
 
@@ -29,7 +29,7 @@ export function createElement<P extends Props>(
 		props: {
 			...props,
 			children: children?.map((child) =>
-				typeof child === 'string' ? createTextNode(child) : child
+				typeof child === 'string' ? textNodeFactory(child) : child
 			),
 		},
 	}

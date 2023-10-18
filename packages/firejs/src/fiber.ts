@@ -1,10 +1,10 @@
 import { createDOMElement, updateDOMElement } from './vdom'
 
-import type { Fiber, JSXElement } from './types'
+import { isFunctionComponent, type Fiber, type JSXElement } from './types'
 import { currentRoot, deletions, nextUnitOfWork, wipRoot } from './globals'
 
 /**
- * Commit the root fiber to the DOM
+ * Sincroniza la raíz actual con el DOM
  */
 export function commitRoot() {
 	deletions.current?.forEach(commitWork)
@@ -14,6 +14,9 @@ export function commitRoot() {
 	wipRoot.current = null
 }
 
+/**
+ * Sincroniza la unidad de trabajo con el DOM
+ */
 export function commitWork(fiber: Fiber | null) {
 	if (!fiber) {
 		return
@@ -41,6 +44,10 @@ export function commitWork(fiber: Fiber | null) {
 	commitWork(fiber.sibling)
 }
 
+/**
+ * Bucle que programa las unidades de trabaho para ser ejecutadas cuando el navegador está inactivo.
+ * Si se cumple la deadline se cede el trabajo hasta el siguiente tiempo inactivo.
+ */
 export function workLoop(deadline: IdleDeadline) {
 	let shouldYield = false
 
@@ -57,15 +64,20 @@ export function workLoop(deadline: IdleDeadline) {
 	requestIdleCallback(workLoop)
 }
 
+/**
+ * empieza el bucle
+ */
 requestIdleCallback(workLoop)
 
+/**
+ * Realizar unidad de trabajo actual
+ */
 export function performUnitOfWork(fiber: Fiber): Fiber | null {
-	if (!fiber.dom) {
-		fiber.dom = createDOMElement(fiber)
+	if (isFunctionComponent(fiber.type)) {
+		updateFunctionComponent(fiber)
+	} else {
+		updateHostComponent(fiber)
 	}
-
-	const elements = fiber.props.children
-	reconcileChildren(fiber, elements)
 
 	if (fiber.child) {
 		return fiber.child
@@ -82,6 +94,29 @@ export function performUnitOfWork(fiber: Fiber): Fiber | null {
 	}
 }
 
+/**
+ * Actualiza el componente funcional pasando el JSXElement como children y reconciliando los hijos de la unidad de trabajo
+ */
+function updateFunctionComponent(fiber: Fiber) {
+	const children = [(fiber.type as Function)(fiber.props)]
+
+	reconcileChildren(fiber, children)
+}
+
+/**
+ * Actualiza el componente host creando el DOMElement si no existe y reconciliando los hijos de la unidad de trabajo
+ */
+function updateHostComponent(fiber: Fiber) {
+	if (!fiber.dom) {
+		fiber.dom = createDOMElement(fiber)
+	}
+
+	reconcileChildren(fiber, fiber.props.children)
+}
+
+/**
+ * Reconcilia los hijos del fiber, cambiando el tipo de Fiber según estado
+ */
 function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	let index = 0
 	let oldFiber = wipFiber.alternate?.child

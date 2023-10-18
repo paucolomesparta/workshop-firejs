@@ -1,43 +1,25 @@
 export type Props = Record<string, any>
-export type State = Record<string, any>
-
-export type JSXElement<P extends Props = Props> =
-	| {
-			type: string
-			props: P & { children: JSXElement[] }
-	  }
-	| {
-			type: 'TEXT'
-			props: P & { nodeValue: string }
-	  }
 
 export type DOMElement = HTMLElement | Text
-export type FireElement = JSXElement | string
+export type FireElementType = string | Function | 'TEXT_NODE'
+export type FireElement = string | Function | undefined
 
-export type Patch =
-	| {
-			type: 'REPLACE'
-	  }
-	| {
-			type: 'REMOVE'
-	  }
-	| {
-			type: 'UPDATE'
-			props: Props
-			children: Patch[]
-	  }
+export type JSXElement<P extends Props = Props> = {
+	type: FireElementType
+	props: P & { children: JSXElement[]; nodeValue?: string }
+}
 
 export type RefObject<T> = {
 	current: T | null
 }
 
-export type ComponentType = Function | string
-
 export type Fiber = {
+	type: FireElementType
+	props: Props & { children: JSXElement[]; nodeValue?: string }
 	dom: DOMElement
 	parent?: Fiber
 	child?: Fiber
 	sibling?: Fiber
-	// type: string
-	props: Props & { children: JSXElement[] }
+	alternate?: Fiber
+	effectTag?: 'CREATE' | 'UPDATE' | 'DELETE'
 }

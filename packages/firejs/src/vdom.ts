@@ -1,10 +1,10 @@
 import isPropValid from '@emotion/is-prop-valid'
 
-import { DOMElement, Fiber, FireElement, JSXElement, Props } from './types'
-import { nextUnitOfWork } from './fiber'
+import { DOMElement, Fiber, FireElementType, JSXElement, Props } from './types'
+import { deletions, nextUnitOfWork, wipRoot } from './globals'
 
 function createTextNode(text: string): JSXElement {
-	return { type: 'TEXT', props: { nodeValue: text, children: [] } }
+	return { type: 'TEXT_NODE', props: { nodeValue: text, children: [] } }
 }
 
 export function createElement<P extends Props>(
@@ -23,7 +23,7 @@ export function createElement<P extends Props>(
 	}
 }
 
-export function cloneElement(element: FireElement): FireElement {
+export function cloneElement(element: JSXElement): JSXElement {
 	if (typeof element === 'string') {
 		return element
 	}
@@ -37,9 +37,13 @@ export function cloneElement(element: FireElement): FireElement {
 	}
 }
 
-export function createDOMElement(element: JSXElement): DOMElement {
+export function createDOMElement(element: Fiber): DOMElement {
 	if (typeof element === 'string') {
 		return document.createTextNode(element)
+	}
+
+	if (typeof element.type === 'function') {
+		return
 	}
 
 	const node = document.createElement(element.type)
@@ -78,19 +82,29 @@ export function createDOMElement(element: JSXElement): DOMElement {
 	return node
 }
 
+export const typeofJsxElement = (element: JSXElement): FireElementType =>
+	typeof element === 'string' ? 'TEXT_NODE' : element.type
+
 export function render(element: JSXElement, container: HTMLElement | Text) {
-	nextUnitOfWork.current = {
+	wipRoot.current = {
+		type: typeof element === 'string' ? element : element.type,
 		dom: container,
 		props: {
 			children: [element],
+			nodeValue: typeof element === 'string' ? element : undefined,
 		},
+		alternate: wipRoot.current,
 	}
 
-	const node = createDOMElement(element)
+	nextUnitOfWork.current = wipRoot.current
 
-	for (const child of element.props.children) {
-		render(child, node)
-	}
+	deletions.current = []
 
-	container.appendChild(node)
+	// const node = createDOMElement(element)
+
+	// for (const child of element.props.children) {
+	// 	render(child, node)
+	// }
+
+	// container.appendChild(node)
 }

@@ -2,7 +2,10 @@
     "name": "firejs",
     "version": "1.0.0",
     "description": "React-like reactive web framework for the modern web",
-    "main": "index.js",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc --build ."
+    },
     "dependencies": {
         "@emotion/is-prop-valid": "^1.2.1",
         "typescript": "^4.8.4"

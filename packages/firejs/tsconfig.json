@@ -1,4 +1,12 @@
 {
 	"extends": "../../tsconfig.json",
-	"files": ["src/index.ts"]
+	"include": ["src/**/*.ts"],
+	"compileOnSave": true,
+	"watchOptions": {
+		"excludeDirectories": ["node_modules", "dist"]
+	},
+	"compilerOptions": {
+		"outDir": "dist",
+		"declaration": true
+	}
 }

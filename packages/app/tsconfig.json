@@ -1,8 +1,8 @@
 {
 	"extends": "../../tsconfig.json",
-	"files": ["src/index.tsx"],
+	"includes": ["src/index.tsx"],
 	"compilerOptions": {
-		"jsx": "react-jsx",
+		"jsx": "preserve",
 		"jsxImportSource": "firejs",
 		"jsxFactory": "firejs.createElement"
 	}

@@ -4,8 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "build": "yarn workspaces run build"
+  },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "packageManager": "yarn@3.6.4"
 }

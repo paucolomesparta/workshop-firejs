@@ -1,4 +1,11 @@
-import { DOMElement, Fiber, FireElementType, JSXElement, Props } from './types'
+import {
+	DOMElement,
+	DOMElementKeys,
+	Fiber,
+	FireElementType,
+	JSXElement,
+	Props,
+} from './types'
 import { deletions, nextUnitOfWork, wipRoot } from './globals'
 import {
 	getEventListenerKey,
@@ -13,7 +20,7 @@ function createTextNode(text: string): JSXElement {
 }
 
 export function createElement<P extends Props>(
-	type: string,
+	type: DOMElementKeys,
 	props: P,
 	...children: JSXElement[]
 ): JSXElement<P> {

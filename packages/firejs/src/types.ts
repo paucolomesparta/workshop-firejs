@@ -1,10 +1,8 @@
 export type Props = Record<string, any>
 
 export type DOMElement = HTMLElement | Text
-export type FireElementType =
-	| keyof HTMLElementTagNameMap
-	| Function
-	| 'TEXT_NODE'
+export type DOMElementKeys = keyof HTMLElementTagNameMap
+export type FireElementType = DOMElementKeys | Function | 'TEXT_NODE'
 export type FireElement = string | Function | null | undefined
 
 export type JSXElement<P extends Props = Props> = {

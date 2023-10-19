@@ -104,6 +104,11 @@ function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
 		});
 }
 
+/**
+ * 1. eliminar los elementos que se han eliminado
+ * 2. añadir los nuevos elementos
+ * 3. la root WIP pasa a ser la root actual
+ */
 function commitRoot() {
 	deletions.forEach(commitWork);
 	commitWork(wipRoot.child);

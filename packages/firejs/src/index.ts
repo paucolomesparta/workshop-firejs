@@ -1,4 +1,3 @@
-import { JsxElement } from "typescript";
 import {
 	DOMElement,
 	Fiber,

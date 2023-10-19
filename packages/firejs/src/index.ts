@@ -6,6 +6,7 @@ import {
 	Hook,
 	JSXElement,
 	Props,
+	isFunctionComponent,
 } from "./types";
 
 function cloneElement(
@@ -167,8 +168,7 @@ function workLoop(deadline: IdleDeadline) {
 requestIdleCallback(workLoop);
 
 function performUnitOfWork(fiber: Fiber) {
-	const isFunctionComponent = fiber.type instanceof Function;
-	if (isFunctionComponent) {
+	if (isFunctionComponent(fiber.type)) {
 		updateFunctionComponent(fiber);
 	} else {
 		updateHostComponent(fiber);

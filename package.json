@@ -5,9 +5,9 @@
 	"license": "MIT",
 	"private": true,
 	"scripts": {
-		"build": "yarn workspaces run build",
-		"lint": "prettier --write .",
-		"dev": "yarn workspace app run dev"
+		"build:watch": "yarn workspace firejs run build:watch",
+		"dev": "yarn workspace app run dev",
+		"lint": "prettier --write ."
 	},
 	"workspaces": [
 		"packages/*"

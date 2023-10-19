@@ -1,8 +1,8 @@
-export type Props = Record<string, any>;
+export type Props = Record<string, any> | {};
 
 export type DOMElement = HTMLElement | Text;
 export type DOMElementKeys = keyof HTMLElementTagNameMap;
-export type FireElementType = DOMElementKeys | Function | "TEXT_NODE";
+export type FireElementType = DOMElementKeys | Function | "TEXT_ELEMENT";
 export type FireElement = string | JSXElement;
 
 export type JSXElement<P extends Props = Props> = {
@@ -20,10 +20,6 @@ export function isFunctionComponent<P extends Props = Props>(
 	return element instanceof Function;
 }
 
-export type RefObject<T> = {
-	current: T | null;
-};
-
 export type Hook = {
 	state: any;
 	queue: any[];
@@ -37,6 +33,6 @@ export type Fiber = {
 	child?: Fiber;
 	sibling?: Fiber;
 	alternate?: Fiber; // link to old fiber
-	effectTag?: "CREATE" | "UPDATE" | "DELETE";
+	effectTag?: "PLACEMENT" | "UPDATE" | "DELETION";
 	hooks?: Hook[];
 };

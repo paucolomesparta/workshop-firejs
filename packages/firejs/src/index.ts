@@ -111,6 +111,14 @@ function commitRoot() {
 	wipRoot = null;
 }
 
+/**
+ * 1. buscar el padre del elemento (puede haberse eliminado)
+ * 2. depende del tipo de efecto:
+ * 	- PLACEMENT: añadir al DOM
+ * 	- UPDATE: actualizar el DOM
+ * 	- DELETION: eliminar del DOM
+ * 3. recorrer hijo y hermano
+ */
 function commitWork(fiber: Fiber) {
 	if (!fiber) {
 		return;
@@ -134,6 +142,10 @@ function commitWork(fiber: Fiber) {
 	commitWork(fiber.sibling);
 }
 
+/**
+ * 1. se crea la root fiber
+ * 2. se crea la unidad de trabajo 
+ */
 function render(element: JSXElement, container: DOMElement) {
 	wipRoot = {
 		dom: container,
@@ -151,6 +163,9 @@ let currentRoot = null;
 let wipRoot = null;
 let deletions = null;
 
+/**
+ * 
+ */
 function workLoop(deadline: IdleDeadline) {
 	let shouldYield = false;
 	while (nextUnitOfWork && !shouldYield) {
@@ -167,6 +182,11 @@ function workLoop(deadline: IdleDeadline) {
 
 requestIdleCallback(workLoop);
 
+/**
+ * 1. añadir elemento al DOM
+ * 2. crear los hijos del elemento
+ * 3. seleccionar la siguiente unidad de trabajo
+ */
 function performUnitOfWork(fiber: Fiber) {
 	if (isFunctionComponent(fiber.type)) {
 		updateFunctionComponent(fiber);
@@ -188,6 +208,11 @@ function performUnitOfWork(fiber: Fiber) {
 let wipFiber = null;
 let hookIndex = null;
 
+/**
+ * 1. se crea la fiber WIP
+ * 2. se ejecuta la función del componente
+ * 3. reconciliar los hijos
+ */
 function updateFunctionComponent(fiber: Fiber) {
 	wipFiber = fiber;
 	hookIndex = 0;
@@ -227,6 +252,11 @@ function useState<T>(initial: T = null) {
 	return [hook.state, setState];
 }
 
+/**
+ * Para elementos del DOM:
+ * 1. crear el elemento
+ * 2. reconciliar los hijos
+ */
 function updateHostComponent(fiber: Fiber) {
 	if (!fiber.dom) {
 		fiber.dom = createDom(fiber);
@@ -234,8 +264,15 @@ function updateHostComponent(fiber: Fiber) {
 	reconcileChildren(fiber, fiber.props.children);
 }
 
+/**
+ * para cada hijo del elemento:
+ * 1. recorrer en preorden
+ * 2. comparar con anterior
+ * 3. crear nueva fiber
+ */
 function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	let index = 0;
+	// acceder a la anterior fiber (si la hay)
 	let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
 	let prevSibling = null;
 
@@ -245,6 +282,7 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 
 		const sameType = oldFiber && element && element.type == oldFiber.type;
 
+		// si es el mismo tipo se actualiza
 		if (sameType) {
 			newFiber = {
 				type: oldFiber.type,
@@ -255,6 +293,8 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 				effectTag: "UPDATE",
 			};
 		}
+
+		// si existe nuevo elemento pero el tipo no coincide o no existe se crea
 		if (element && !sameType) {
 			newFiber = {
 				type: element.type,
@@ -265,11 +305,14 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 				effectTag: "PLACEMENT",
 			};
 		}
+
+		// si existe elemento anterior pero el tipo no coincide se elimina
 		if (oldFiber && !sameType) {
 			oldFiber.effectTag = "DELETION";
 			deletions.push(oldFiber);
 		}
 
+		// avanzar en la lista de hijos, puede ser que no exista
 		if (oldFiber) {
 			oldFiber = oldFiber.sibling;
 		}

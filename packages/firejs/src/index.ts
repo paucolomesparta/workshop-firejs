@@ -8,6 +8,23 @@ import {
 	Props,
 } from "./types";
 
+function cloneElement(
+	element: JSXElement,
+	props: Props,
+	...children: FireElement[]
+) {
+	return {
+		...element,
+		props: {
+			...element.props,
+			...props,
+			children: children.map(child =>
+				typeof child === "object" ? child : createTextElement(child),
+			),
+		},
+	};
+}
+
 function createElement(
 	type: FireElementType,
 	props: Props,
@@ -50,7 +67,7 @@ const isProperty = (key: string) => key !== "children" && !isEvent(key);
 const isNew = (prev: Props, next: Props) => key => prev[key] !== next[key];
 const isGone = (next: Props) => (key: string) => !(key in next);
 
-function updateDom(dom, prevProps, nextProps) {
+function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
 	//Remove old or changed event listeners
 	Object.keys(prevProps)
 		.filter(isEvent)
@@ -276,5 +293,5 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	}
 }
 
-export { createElement, render, useState };
+export { createElement, cloneElement, render, useState };
 export default { createElement, render, useState };

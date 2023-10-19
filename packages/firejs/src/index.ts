@@ -126,19 +126,11 @@ function commitWork(fiber: Fiber) {
 	} else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
 		updateDom(fiber.dom, fiber.alternate.props, fiber.props);
 	} else if (fiber.effectTag === "DELETION") {
-		commitDeletion(fiber, domParent);
+		domParent.removeChild(fiber.dom);
 	}
 
 	commitWork(fiber.child);
 	commitWork(fiber.sibling);
-}
-
-function commitDeletion(fiber: Fiber, domParent: DOMElement) {
-	if (fiber.dom) {
-		domParent.removeChild(fiber.dom);
-	} else {
-		commitDeletion(fiber.child, domParent);
-	}
 }
 
 function render(element: JSXElement, container: DOMElement) {

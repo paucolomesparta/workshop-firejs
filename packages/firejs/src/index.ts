@@ -63,12 +63,31 @@ function createDom(fiber: Fiber) {
 	return dom;
 }
 
-const isEvent = (key: string) => key.startsWith("on");
-const isProperty = (key: string) => key !== "children" && !isEvent(key);
-const isNew = (prev: Props, next: Props) => key => prev[key] !== next[key];
-const isGone = (next: Props) => (key: string) => !(key in next);
+function shallowEqual(prev: Props, next: Props) {
+	return Object.is(prev, next);
+}
+
+function isEvent(key: string) {
+	return key.startsWith("on");
+}
+
+function isProperty(key: string) {
+	return key !== "children" && !isEvent(key);
+}
+
+function isNew(prev: Props, next: Props) {
+	return (key: string) => prev[key] !== next[key];
+}
+
+function isGone(next: Props) {
+	return (key: string) => !(key in next);
+}
 
 function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
+	if (shallowEqual(prevProps, nextProps)) {
+		return;
+	}
+
 	//Remove old or changed event listeners
 	Object.keys(prevProps)
 		.filter(isEvent)
@@ -210,8 +229,8 @@ function performUnitOfWork(fiber: Fiber) {
 	}
 }
 
-let wipFiber = null;
-let hookIndex = null;
+let wipFiber: Fiber = null;
+let hookIndex: number = null;
 
 /**
  * 1. se crea la fiber WIP
@@ -228,9 +247,7 @@ function updateFunctionComponent(fiber: Fiber) {
 
 function useState<T>(initial: T = null) {
 	const oldHook =
-		wipFiber.alternate &&
-		wipFiber.alternate.hooks &&
-		wipFiber.alternate.hooks[hookIndex];
+		wipFiber?.alternate?.hooks?.[hookIndex];
 	const hook: Hook = {
 		state: oldHook ? oldHook.state : initial,
 		queue: [],

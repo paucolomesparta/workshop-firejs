@@ -21,7 +21,7 @@ export type Hook = {
 
 export type Fiber = {
 	type?: FireElementType;
-	props: Props & { children: JSXElement[]; nodeValue?: string };
+	props: Props & { children: JSXElement[]; nodeValue?: string, className?: string };
 	dom: DOMElement;
 	parent?: Fiber;
 	child?: Fiber;

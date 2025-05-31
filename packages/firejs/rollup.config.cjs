@@ -17,7 +17,8 @@ module.exports = [
 			commonjs(),
 			typescript({
 				tsconfig: path.resolve(__dirname, "tsconfig.json"),
-				declaration: false, // Let tsc handle declarations
+				declaration: true,
+				declarationDir: "dist",
 				sourceMap: true,
 			}),
 		],

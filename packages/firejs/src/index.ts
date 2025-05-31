@@ -92,7 +92,7 @@ function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
 		.filter(isProperty)
 		.filter(isNew(prevProps, nextProps))
 		.forEach(name => {
-			dom[name] = nextProps[name];
+			dom[name === "className" ? "class" : name] = nextProps[name];
 		});
 
 	// Add event listeners

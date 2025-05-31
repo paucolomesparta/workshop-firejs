@@ -14,12 +14,6 @@ export interface FunctionComponent<P extends Props = Props> {
 	(props: P): JSXElement;
 }
 
-export function isFunctionComponent<P extends Props = Props>(
-	element: FireElementType,
-): element is FunctionComponent<P> {
-	return element instanceof Function;
-}
-
 export type Hook = {
 	state: any;
 	queue: any[];
@@ -36,3 +30,18 @@ export type Fiber = {
 	effectTag?: "PLACEMENT" | "UPDATE" | "DELETION";
 	hooks?: Hook[];
 };
+
+export declare namespace JSX {
+	type Element = JSXElement;
+
+	interface IntrinsicElements {
+		[key: string]: Props;
+	}
+
+	interface IntrinsicAttributes {
+		children?: FireElement[];
+		style?: string;
+		onClick?: () => void;
+		[key: string]: any;
+	}
+}

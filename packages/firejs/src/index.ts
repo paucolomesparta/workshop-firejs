@@ -1,29 +1,18 @@
-import {
+import type {
 	DOMElement,
 	Fiber,
 	FireElement,
 	FireElementType,
+	FunctionComponent,
 	Hook,
 	JSXElement,
 	Props,
-	isFunctionComponent,
 } from "./types";
 
-function cloneElement(
-	element: JSXElement,
-	props: Props,
-	...children: FireElement[]
-) {
-	return {
-		...element,
-		props: {
-			...element.props,
-			...props,
-			children: children.map(child =>
-				typeof child === "object" ? child : createTextElement(child),
-			),
-		},
-	};
+export function isFunctionComponent<P extends Props = Props>(
+	element: FireElementType,
+): element is FunctionComponent<P> {
+	return element instanceof Function;
 }
 
 function createElement(
@@ -292,7 +281,7 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 
 	while (index < elements.length || oldFiber != null) {
 		const element = elements[index];
-		let newFiber = null;
+		let newFiber: Fiber | null = null;
 
 		const sameType = oldFiber && element && element.type == oldFiber.type;
 

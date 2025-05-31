@@ -1,3 +1,4 @@
+import isPropValid from "@emotion/is-prop-valid";
 import type {
 	DOMElement,
 	Fiber,
@@ -57,7 +58,7 @@ function isEvent(key: string) {
 }
 
 function isProperty(key: string) {
-	return key !== "children" && !isEvent(key);
+	return key !== "children" && !isEvent(key) && isPropValid(key);
 }
 
 function isNew(prev: Props, next: Props) {

@@ -11,8 +11,9 @@
 		"@emotion/is-prop-valid": "^1.2.1"
 	},
 	"exports": {
-		".": "./src/index.ts",
-		"./jsx-runtime": "./src/jsx-runtime.ts"
+		".": "./dist/index.js",
+		"./jsx-runtime": "./dist/jsx-runtime.js",
+		"./jsx-dev-runtime": "./dist/jsx-runtime.js"
 	},
 	"devDependencies": {
 		"esbuild": "^0.19.0",

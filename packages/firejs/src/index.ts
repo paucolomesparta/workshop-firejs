@@ -149,7 +149,7 @@ function commitWork(fiber: Fiber) {
 
 /**
  * 1. se crea la root fiber
- * 2. se crea la unidad de trabajo 
+ * 2. se crea la unidad de trabajo
  */
 function render(element: JSXElement, container: DOMElement) {
 	wipRoot = {
@@ -169,7 +169,7 @@ let wipRoot = null;
 let deletions = null;
 
 /**
- * 
+ *
  */
 function workLoop(deadline: IdleDeadline) {
 	let shouldYield = false;
@@ -227,8 +227,7 @@ function updateFunctionComponent(fiber: Fiber) {
 }
 
 function useState<T>(initial: T = null) {
-	const oldHook =
-		wipFiber?.alternate?.hooks?.[hookIndex];
+	const oldHook = wipFiber?.alternate?.hooks?.[hookIndex];
 	const hook: Hook = {
 		state: oldHook ? oldHook.state : initial,
 		queue: [],

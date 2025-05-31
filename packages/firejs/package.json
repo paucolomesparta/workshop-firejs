@@ -4,11 +4,15 @@
 	"description": "React-like reactive web framework for the modern web",
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "esbuild src/index.ts --format=esm --platform=node --outdir=dist && tsc --emitDeclarationOnly",
-		"build:watch": "npm run build -- --watch"
+		"build": "rollup -c",
+		"build:watch": "rollup -c -w"
 	},
 	"dependencies": {
 		"@emotion/is-prop-valid": "^1.2.1"
+	},
+	"exports": {
+		".": "./src/index.ts",
+		"./jsx-runtime": "./src/jsx-runtime.ts"
 	},
 	"devDependencies": {
 		"esbuild": "^0.19.0",

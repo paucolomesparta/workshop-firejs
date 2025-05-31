@@ -1,6 +1,6 @@
-import { createElement, render, useState } from "firejs";
+import { createElement, useState } from "firejs";
 
-import './app.css';
+import "./app.css";
 
 export function App() {
 	const [val, setVal] = useState(1);
@@ -47,5 +47,3 @@ export function App() {
 		),
 	);
 }
-
-

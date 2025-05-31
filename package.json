@@ -16,5 +16,10 @@
 	"packageManager": "npm@10.9.0",
 	"dependencies": {
 		"prettier": "^3.0.3"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-react": "^4.5.0",
+		"esbuild": "^0.25.5",
+		"vite": "^6.3.5"
 	}
 }

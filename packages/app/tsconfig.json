@@ -1,6 +1,6 @@
 {
 	"extends": "../../tsconfig.json",
-	"includes": ["src/index.tsx"],
+	"include": ["src/index.tsx"],
 	"compilerOptions": {
 		"jsx": "preserve",
 		"jsxImportSource": "firejs",

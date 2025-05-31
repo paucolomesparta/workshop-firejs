@@ -36,7 +36,7 @@ function createElement(
 		props: {
 			...props,
 			children: children.map(child =>
-				typeof child === "object" ? child : createTextElement(child),
+				typeof child === "string" ? createTextElement(child) : child,
 			),
 		},
 	};
@@ -63,10 +63,6 @@ function createDom(fiber: Fiber) {
 	return dom;
 }
 
-function shallowEqual(prev: Props, next: Props) {
-	return Object.is(prev, next);
-}
-
 function isEvent(key: string) {
 	return key.startsWith("on");
 }
@@ -84,10 +80,6 @@ function isGone(next: Props) {
 }
 
 function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
-	if (shallowEqual(prevProps, nextProps)) {
-		return;
-	}
-
 	//Remove old or changed event listeners
 	Object.keys(prevProps)
 		.filter(isEvent)
@@ -350,5 +342,4 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	}
 }
 
-export { createElement, cloneElement, render, useState };
-export default { createElement, render, useState };
+export { createElement, render, useState };

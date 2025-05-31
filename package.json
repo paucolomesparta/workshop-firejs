@@ -5,14 +5,15 @@
 	"license": "MIT",
 	"private": true,
 	"scripts": {
-		"build:watch": "yarn workspace firejs run build:watch",
-		"dev": "yarn workspace app run dev",
+		"build:watch": "npm run build:watch --workspace=firejs",
+		"dev": "npm run dev --workspace=app",
 		"lint": "prettier --write ."
 	},
 	"workspaces": [
-		"packages/*"
+		"packages/firejs",
+		"packages/app"
 	],
-	"packageManager": "yarn@3.6.4",
+	"packageManager": "npm@10.9.0",
 	"dependencies": {
 		"prettier": "^3.0.3"
 	}

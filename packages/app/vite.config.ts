@@ -8,6 +8,7 @@ export default defineConfig({
 		},
 		extensions: [".ts", ".tsx", ".js", ".json"],
 	},
+	publicDir: "public",
 	esbuild: {
 		jsx: "automatic",
 		jsxImportSource: "firejs",

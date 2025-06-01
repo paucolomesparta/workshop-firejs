@@ -57,6 +57,10 @@ function isEvent(key: string) {
 	return key.startsWith("on");
 }
 
+function getEventName(handler: string) {
+	return handler.toLowerCase().replace(/^on/, "");
+}
+
 function isProperty(key: string) {
 	return key !== "children" && !isEvent(key) && isPropValid(key);
 }
@@ -70,39 +74,31 @@ function isGone(next: Props) {
 }
 
 function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
-	//Remove old or changed event listeners
-	Object.keys(prevProps)
-		.filter(isEvent)
-		.filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
-		.forEach(name => {
-			const eventType = name.toLowerCase().substring(2);
-			dom.removeEventListener(eventType, prevProps[name]);
-		});
+	for (const key in prevProps) {
+		const attr = key === "className" ? "class" : key;
 
-	// Remove old properties
-	Object.keys(prevProps)
-		.filter(isProperty)
-		.filter(isGone(nextProps))
-		.forEach(name => {
-			dom[name] = "";
-		});
+		if (isGone(nextProps)(key)) {
+			if (isEvent(key)) {
+				const eventType = getEventName(key);
+				dom.removeEventListener(eventType, prevProps[key]);
+			}
 
-	// Set new or changed properties
-	Object.keys(nextProps)
-		.filter(isProperty)
-		.filter(isNew(prevProps, nextProps))
-		.forEach(name => {
-			dom[name === "className" ? "class" : name] = nextProps[name];
-		});
+			if (isProperty(key)) {
+				dom[attr] = "";
+			}
+		}
 
-	// Add event listeners
-	Object.keys(nextProps)
-		.filter(isEvent)
-		.filter(isNew(prevProps, nextProps))
-		.forEach(name => {
-			const eventType = name.toLowerCase().substring(2);
-			dom.addEventListener(eventType, nextProps[name]);
-		});
+		if (isNew(prevProps, nextProps)(key)) {
+			if (isEvent(key)) {
+				const eventType = getEventName(key);
+				dom.addEventListener(eventType, nextProps[key]);
+			}
+
+			if (isProperty(key)) {
+				dom[attr] = nextProps[key];
+			}
+		}
+	}
 }
 
 /**

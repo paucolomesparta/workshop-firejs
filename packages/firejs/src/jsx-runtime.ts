@@ -1,4 +1,4 @@
-import { createElement } from "./index";
+import { createElement } from "./index.js";
 
 export { createElement };
 

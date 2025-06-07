@@ -8,7 +8,7 @@ import type {
 	Hook,
 	JSXElement,
 	Props,
-} from "./types";
+} from "./types.js";
 
 export function isFunctionComponent<P extends Props = Props>(
 	element: FireElementType,

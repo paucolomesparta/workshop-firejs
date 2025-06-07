@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"description": "React-like reactive web framework for the modern web",
 	"main": "dist/index.js",
+	"type": "module",
 	"scripts": {
 		"build": "rollup -c",
 		"build:watch": "rollup -c -w"

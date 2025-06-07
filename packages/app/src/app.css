@@ -1,0 +1,86 @@
+/*
+  This file uses Sparta theme tokens from theme.css for all app and table styles.
+  It is the main style entry for the app and table components.
+*/
+
+@import './theme.css';
+
+/* Style for the App component's root div */
+.app-root {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	gap: var(--sparta-components-spacing-24);
+	height: 100vh;
+	font-family: var(--sparta-components-typography-family);
+}
+
+/* Style for the main title in the App component */
+.app-title {
+	font-family: var(--sparta-components-typography-family);
+	font-weight: var(--sparta-components-typography-weight-regular);
+	font-size: var(--sparta-components-typography-sizes-h1-fontSize);
+	line-height: var(--sparta-components-typography-sizes-h1-lineHeight);
+	color: var(--sparta-components-colors-main-darker);
+	margin-bottom: var(--sparta-components-spacing-16);
+}
+
+/* Style for the Table component's container div */
+.table-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--sparta-components-spacing-16);
+}
+
+/* Style for the Table's <table> element */
+.price-table {
+	border-collapse: collapse;
+	min-width: 600px;
+	background: var(--sparta-components-colors-neutral-dark_00);
+	box-shadow: var(--sparta-components-shadows-5);
+}
+
+/* Styles for the Table's <th> and <td> elements */
+.price-table-th {
+	border: 1px solid var(--sparta-components-colors-neutral-dark_10);
+	padding: var(--sparta-components-spacing-8);
+	background: var(--sparta-components-colors-main-light);
+	font-weight: var(--sparta-components-typography-weight-semibold);
+	color: var(--sparta-components-colors-neutral-dark_100);
+}
+
+.price-table-td {
+	border: 1px solid var(--sparta-components-colors-neutral-dark_10);
+	padding: var(--sparta-components-spacing-8);
+	text-align: right;
+	min-width: 80px;
+	background: var(--sparta-components-colors-neutral-dark_00);
+	color: var(--sparta-components-colors-neutral-dark_95);
+}
+
+.price-table-td:first-child {
+	font-weight: var(--sparta-components-typography-weight-bold);
+	background: var(--sparta-components-colors-neutral-dark_10);
+	color: var(--sparta-components-colors-main-darker);
+	text-align: left;
+}
+
+/* Style for the randomize prices button in the Table component */
+.randomize-btn {
+	margin-top: var(--sparta-components-spacing-16);
+	font-family: var(--sparta-components-typography-family);
+	background-color: var(--sparta-components-colors-main-primary);
+	border-radius: var(--sparta-components-borders-radius-6);
+	border: none;
+	color: var(--sparta-components-colors-neutral-dark_00);
+	padding: var(--sparta-components-spacing-16);
+	cursor: pointer;
+	font-size: var(--sparta-components-typography-sizes-body0-fontSize);
+	transition: background 0.2s;
+}
+
+.randomize-btn:hover {
+	background-color: var(--sparta-components-colors-main-dark);
+}

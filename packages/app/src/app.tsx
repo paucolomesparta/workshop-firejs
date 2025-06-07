@@ -1,31 +1,54 @@
-import { useState } from "firejs";
+//
+// App component uses CSS classes styled with Sparta theme tokens from theme.css via app.css
+//
 
+import { useState } from "firejs";
+import { Table } from "./table";
 import "./app.css";
 
+const PRODUCTS = [
+	"EBOB",
+	"RBOB",
+	"SING 95 Dubai Spread",
+	"Naphtha",
+	"Jet",
+	"Fuel Oil"
+];
+const TENORS = ["Sep 25", "Oct 25", "Nov 25", "Dec 25"];
+
+function getInitialPrices() {
+	const prices = {};
+	for (const product of PRODUCTS) {
+		prices[product] = {};
+		for (const tenor of TENORS) {
+			prices[product][tenor] = 500 + Math.random() * 100; // random realistic price
+		}
+	}
+	return prices;
+}
+
 export function App() {
-	const [val, setVal] = useState(1);
+	const [prices, setPrices] = useState(getInitialPrices());
+
+	function randomizePrices() {
+		setPrices(prices => {
+			const newPrices = {};
+			for (const product of PRODUCTS) {
+				newPrices[product] = {};
+				for (const tenor of TENORS) {
+					// Randomly change price by -5 to +5
+					const change = (Math.random() - 0.5) * 10;
+					newPrices[product][tenor] = Math.max(0, prices[product][tenor] + change);
+				}
+			}
+			return newPrices;
+		});
+	}
 
 	return (
-		<div
-			style="display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1em; height: 100vh; font-family: Vodafone Rg, Helvetica;"
-		>
-			<h1 style="font-family: Vodafone Rg, Helvetica; font-weight: 200;">value is {val}</h1>
-			<div
-				style="display: flex; gap: 1em; align-items: center; justify-content: center; flex-direction: row"
-			>
-				<button
-					onClick={() => setVal(value => value - 1)}
-					style="font-family: Vodafone Rg, Helvetica; background-color: red; border-radius: 6px; border: none; color: white; padding: 1rem; cursor: pointer; font-size: 1em"
-				>
-					Decrease
-				</button>
-				<button
-					onClick={() => setVal(value => value + 1)}
-					style="font-family: Vodafone Rg, Helvetica; background-color: red; border-radius: 6px; border: none; color: white; padding: 1rem; cursor: pointer; font-size: 1em"
-				>
-					Add
-				</button>
-			</div>
+		<div className="app-root">
+			<h1 className="app-title">Sparta Commodities Price Grid</h1>
+			<Table products={PRODUCTS} tenors={TENORS} prices={prices} onRandomize={randomizePrices} />
 		</div>
 	);
 }

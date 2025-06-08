@@ -25,7 +25,7 @@ function createElement(
 		type,
 		props: {
 			...props,
-			children: children.map(child =>
+			children: children.flat().map(child =>
 				typeof child === "string" ? createTextElement(child) : child,
 			),
 		},
@@ -74,31 +74,59 @@ function isGone(next: Props) {
 }
 
 function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
-	for (const key in prevProps) {
-		const attr = key === "className" ? "class" : key;
-
-		if (isGone(nextProps)(key)) {
-			if (isEvent(key)) {
-				const eventType = getEventName(key);
-				dom.removeEventListener(eventType, prevProps[key]);
-			}
-
-			if (isProperty(key)) {
-				dom[attr] = "";
-			}
-		}
-
-		if (isNew(prevProps, nextProps)(key)) {
-			if (isEvent(key)) {
-				const eventType = getEventName(key);
-				dom.addEventListener(eventType, nextProps[key]);
-			}
-
-			if (isProperty(key)) {
-				dom[attr] = nextProps[key];
-			}
-		}
+	// Handle text content for text nodes
+	if (dom.nodeType === Node.TEXT_NODE) {
+		dom.nodeValue = (nextProps as any).nodeValue || "";
+		return;
 	}
+
+	const htmlElement = dom as HTMLElement;
+
+	// Remove old or changed event listeners
+	Object.keys(prevProps)
+		.filter(isEvent)
+		.filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
+		.forEach(name => {
+			const eventType = getEventName(name);
+			htmlElement.removeEventListener(eventType, prevProps[name]);
+		});
+
+	// Remove old properties
+	Object.keys(prevProps)
+		.filter(isProperty)
+		.filter(isGone(nextProps))
+		.forEach(name => {
+			if (name === "className") {
+				htmlElement.removeAttribute("class");
+			} else if (name in htmlElement) {
+				(htmlElement as any)[name] = "";
+			} else {
+				htmlElement.removeAttribute(name);
+			}
+		});
+
+	// Set new or changed properties
+	Object.keys(nextProps)
+		.filter(isProperty)
+		.filter(isNew(prevProps, nextProps))
+		.forEach(name => {
+			if (name === "className") {
+				htmlElement.setAttribute("class", nextProps[name]);
+			} else if (name in htmlElement) {
+				(htmlElement as any)[name] = nextProps[name];
+			} else {
+				htmlElement.setAttribute(name, nextProps[name]);
+			}
+		});
+
+	// Add event listeners
+	Object.keys(nextProps)
+		.filter(isEvent)
+		.filter(isNew(prevProps, nextProps))
+		.forEach(name => {
+			const eventType = getEventName(name);
+			htmlElement.addEventListener(eventType, nextProps[name]);
+		});
 }
 
 /**
@@ -137,11 +165,19 @@ function commitWork(fiber: Fiber) {
 	} else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
 		updateDom(fiber.dom, fiber.alternate.props, fiber.props);
 	} else if (fiber.effectTag === "DELETION") {
-		domParent.removeChild(fiber.dom);
+		commitDeletion(fiber, domParent);
 	}
 
 	commitWork(fiber.child);
 	commitWork(fiber.sibling);
+}
+
+function commitDeletion(fiber: Fiber, domParent: DOMElement) {
+	if (fiber.dom) {
+		domParent.removeChild(fiber.dom);
+	} else {
+		commitDeletion(fiber.child, domParent);
+	}
 }
 
 /**

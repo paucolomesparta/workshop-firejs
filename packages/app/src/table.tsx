@@ -2,7 +2,9 @@
 // Table component uses CSS classes styled with Sparta theme tokens from theme.css via app.css
 //
 
-export function Table({ products, tenors, prices, onRandomize }) {
+export function Table({ products, tenors, prices }) {
+	console.log("Table rendered");
+
 	return (
 		<div className="table-container">
 			<table className="price-table">
@@ -10,7 +12,9 @@ export function Table({ products, tenors, prices, onRandomize }) {
 					<tr>
 						<th className="price-table-th">Product</th>
 						{tenors.map(tenor => (
-							<th className="price-table-th" key={tenor}>{tenor}</th>
+							<th className="price-table-th" key={tenor}>
+								{tenor}
+							</th>
 						))}
 					</tr>
 				</thead>
@@ -27,12 +31,6 @@ export function Table({ products, tenors, prices, onRandomize }) {
 					))}
 				</tbody>
 			</table>
-			<button
-				onClick={onRandomize}
-				className="randomize-btn"
-			>
-				Randomize Prices
-			</button>
 		</div>
 	);
-} 
+}

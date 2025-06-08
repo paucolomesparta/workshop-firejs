@@ -1,4 +1,4 @@
-import { createElement } from "./fiber.js";
+import { createElement } from "./reconciler.js";
 
 export { createElement };
 

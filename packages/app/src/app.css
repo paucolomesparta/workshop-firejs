@@ -3,7 +3,12 @@
   It is the main style entry for the app and table components.
 */
 
-@import './theme.css';
+@import "./theme.css";
+
+body {
+	margin: 0;
+	padding: 0;
+}
 
 /* Style for the App component's root div */
 .app-root {
@@ -14,6 +19,17 @@
 	gap: var(--sparta-components-spacing-24);
 	height: 100vh;
 	font-family: var(--sparta-components-typography-family);
+	background: linear-gradient(
+		180deg,
+		var(--sparta-components-colors-blue_dark-dark_05, #01011d) 61.45%,
+		#0505a8 237.25%
+	);
+}
+
+.app-composition {
+	display: flex;
+	flex-direction: column;
+	gap: var(--sparta-components-spacing-16);
 }
 
 /* Style for the main title in the App component */
@@ -36,19 +52,45 @@
 
 /* Style for the Table's <table> element */
 .price-table {
+	flex-grow: 1;
 	border-collapse: collapse;
-	min-width: 600px;
-	background: var(--sparta-components-colors-neutral-dark_00);
-	box-shadow: var(--sparta-components-shadows-5);
+	height: 1px;
+	table-layout: fixed;
+	background-color: var(
+		--n519mq0,
+		var(--sparta-components-colors-neutral_blue-dark_80)
+	);
 }
 
 /* Styles for the Table's <th> and <td> elements */
 .price-table-th {
 	border: 1px solid var(--sparta-components-colors-neutral-dark_10);
 	padding: var(--sparta-components-spacing-8);
-	background: var(--sparta-components-colors-main-light);
 	font-weight: var(--sparta-components-typography-weight-semibold);
 	color: var(--sparta-components-colors-neutral-dark_100);
+
+	font-weight: var(--sparta-components-typography-weight-regular);
+	font-size: var(--n519mql);
+	line-height: var(--n519mqm);
+	color: var(--sparta-components-colors-neutral-dark_35);
+	white-space: pre-line;
+}
+
+.price-table-th:before {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 1px;
+	background-color: var(--sparta-components-colors-neutral_blue-dark_45);
+	z-index: min(
+		var(--sparta-components-layers-base-max),
+		max(
+			var(--sparta-components-layers-base-min),
+			calc(var(--sparta-components-layers-base-min) + var(--_1o5o5be0, 6))
+		)
+	);
 }
 
 .price-table-td {
@@ -56,13 +98,11 @@
 	padding: var(--sparta-components-spacing-8);
 	text-align: right;
 	min-width: 80px;
-	background: var(--sparta-components-colors-neutral-dark_00);
 	color: var(--sparta-components-colors-neutral-dark_95);
 }
 
 .price-table-td:first-child {
 	font-weight: var(--sparta-components-typography-weight-bold);
-	background: var(--sparta-components-colors-neutral-dark_10);
 	color: var(--sparta-components-colors-main-darker);
 	text-align: left;
 }
@@ -93,4 +133,21 @@
 	box-shadow: var(--sparta-components-shadows-5);
 }
 
-.widget-root h1 {
+.widget-header {
+	padding: var(--sparta-components-spacing-4) var(--sparta-components-spacing-8)
+		var(--sparta-components-spacing-4) var(--sparta-components-spacing-8);
+}
+
+.widget-root h2 {
+	font-size: var(--sparta-components-typography-sizes-body3-fontSize);
+	line-height: var(--sparta-components-typography-sizes-body3-lineHeight);
+	color: var(--sparta-components-colors-neutral-dark_00);
+	font-weight: var(--sparta-components-typography-weight-regular);
+}
+
+.widget-root h3 {
+	font-size: var(--sparta-components-typography-sizes-body4-fontSize);
+	line-height: var(--sparta-components-typography-sizes-body4-lineHeight);
+	color: var(--sparta-components-colors-main-primary);
+	font-weight: var(--sparta-components-typography-weight-semibold);
+}

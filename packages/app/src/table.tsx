@@ -3,8 +3,6 @@
 //
 
 export function Table({ products, tenors, prices }) {
-	console.log("Table rendered");
-
 	return (
 		<div className="table-container">
 			<table className="price-table">

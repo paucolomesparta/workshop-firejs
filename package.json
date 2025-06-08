@@ -5,6 +5,7 @@
 	"license": "MIT",
 	"private": true,
 	"scripts": {
+		"build": "npm run build --workspace=firejs",
 		"build:watch": "npm run build:watch --workspace=firejs",
 		"dev": "npm run dev --workspace=app",
 		"lint": "prettier --write ."

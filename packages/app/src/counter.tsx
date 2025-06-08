@@ -12,7 +12,7 @@ export function Counter() {
 				title="Widget"
 				children={
 					<h2>
-						The count is <b>{count}</b>
+						{`The count is ${count}`}
 					</h2>
 				}
 			/>

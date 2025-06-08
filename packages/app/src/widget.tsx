@@ -11,7 +11,7 @@ export function Widget({ title, children }: Props) {
 			<div className="widget-header">
 				<h3>{title}</h3>
 			</div>
-			<div>{children}</div>
+			<div className="widget-content">{children}</div>
 		</div>
 	);
 }

@@ -139,8 +139,8 @@ body {
 }
 
 .widget-root h2 {
-	font-size: var(--sparta-components-typography-sizes-body3-fontSize);
-	line-height: var(--sparta-components-typography-sizes-body3-lineHeight);
+	font-size: var(--sparta-components-typography-sizes-body1-fontSize);
+	line-height: var(--sparta-components-typography-sizes-body1-lineHeight);
 	color: var(--sparta-components-colors-neutral-dark_00);
 	font-weight: var(--sparta-components-typography-weight-regular);
 }
@@ -150,4 +150,8 @@ body {
 	line-height: var(--sparta-components-typography-sizes-body4-lineHeight);
 	color: var(--sparta-components-colors-main-primary);
 	font-weight: var(--sparta-components-typography-weight-semibold);
+}
+
+.widget-content {
+	padding: var(--sparta-components-spacing-8);
 }

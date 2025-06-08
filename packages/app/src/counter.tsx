@@ -4,8 +4,6 @@ import { Widget } from "./widget";
 export function Counter() {
 	const [count, setCount] = useState(0);
 
-	console.log("Counter rendered");
-
 	return (
 		<div className="app-composition">
 			<Widget

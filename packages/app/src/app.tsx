@@ -3,7 +3,7 @@
 //
 
 import { useState } from "firejs";
-import { Table } from "./table";
+import { Table } from "./Table";
 import "./app.css";
 
 const PRODUCTS = [

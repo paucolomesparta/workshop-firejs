@@ -1,4 +1,4 @@
-import { createElement } from "./index.js";
+import { createElement } from "./fiber.js";
 
 export { createElement };
 

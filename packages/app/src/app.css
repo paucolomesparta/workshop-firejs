@@ -84,3 +84,13 @@
 .randomize-btn:hover {
 	background-color: var(--sparta-components-colors-main-dark);
 }
+
+.widget-root {
+	background-color: var(--sparta-components-colors-neutral_blue-dark_80);
+	border-radius: 3px;
+	display: grid;
+	grid-template-rows: min-content 1fr;
+	box-shadow: var(--sparta-components-shadows-5);
+}
+
+.widget-root h1 {

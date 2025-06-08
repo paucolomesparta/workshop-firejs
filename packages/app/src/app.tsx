@@ -5,6 +5,7 @@
 import { useState } from "firejs";
 import { Table } from "./table";
 import "./app.css";
+import { Widget } from "./widget";
 
 const PRODUCTS = [
 	"EBOB",
@@ -47,8 +48,7 @@ export function App() {
 
 	return (
 		<div className="app-root">
-			<h1 className="app-title">Sparta Commodities Price Grid</h1>
-			<Table products={PRODUCTS} tenors={TENORS} prices={prices} onRandomize={randomizePrices} />
+			<Widget title="Widget" children={<Table products={PRODUCTS} tenors={TENORS} prices={prices} onRandomize={randomizePrices} />} />
 		</div>
 	);
 }

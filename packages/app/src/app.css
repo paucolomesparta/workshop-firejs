@@ -136,6 +136,9 @@ body {
 .widget-header {
 	padding: var(--sparta-components-spacing-4) var(--sparta-components-spacing-8)
 		var(--sparta-components-spacing-4) var(--sparta-components-spacing-8);
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: var(--sparta-components-colors-neutral_blue-dark_77);
 }
 
 .widget-root h2 {

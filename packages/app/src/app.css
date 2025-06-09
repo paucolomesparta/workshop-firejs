@@ -141,11 +141,13 @@ body {
 	border-bottom-color: var(--sparta-components-colors-neutral_blue-dark_77);
 }
 
-.widget-root h2 {
+.widget-root .counter-text {
 	font-size: var(--sparta-components-typography-sizes-body1-fontSize);
 	line-height: var(--sparta-components-typography-sizes-body1-lineHeight);
 	color: var(--sparta-components-colors-neutral-dark_00);
 	font-weight: var(--sparta-components-typography-weight-regular);
+	padding-left: var(--sparta-components-spacing-8);
+	padding-right: var(--sparta-components-spacing-8);
 }
 
 .widget-root h3 {

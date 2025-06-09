@@ -9,9 +9,9 @@ export function Counter() {
 			<Widget
 				title="Widget"
 				children={
-					<h2>
-						{`The count is ${count}`}
-					</h2>
+					<p className="counter-text">
+						The count is <b>{`${count}`}</b>
+					</p>
 				}
 			/>
 			<button onClick={() => setCount(x => x + 1)} className="randomize-btn">

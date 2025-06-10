@@ -98,12 +98,12 @@ body {
 	padding: var(--sparta-components-spacing-8);
 	text-align: right;
 	min-width: 80px;
-	color: var(--sparta-components-colors-neutral-dark_95);
+	color: var(--sparta-components-colors-neutral-dark_00);
 }
 
 .price-table-td:first-child {
 	font-weight: var(--sparta-components-typography-weight-bold);
-	color: var(--sparta-components-colors-main-darker);
+	color: var(--sparta-components-colors-main-primary);
 	text-align: left;
 }
 

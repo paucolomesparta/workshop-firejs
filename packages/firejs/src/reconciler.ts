@@ -143,6 +143,8 @@ function commitWork(fiber: Fiber) {
 		return;
 	}
 
+	// postorder traversal
+	// process children first, then siblings, then parent
 	let domParentFiber = fiber.parent;
 	while (!domParentFiber.dom) {
 		domParentFiber = domParentFiber.parent;
@@ -223,6 +225,9 @@ function performUnitOfWork(fiber: Fiber) {
 	if (fiber.child) {
 		return fiber.child;
 	}
+
+	// preorder traversal
+	// process parent first, then siblings, then children
 	let nextFiber = fiber;
 	while (nextFiber) {
 		if (nextFiber.sibling) {
@@ -296,7 +301,8 @@ function updateHostComponent(fiber: Fiber) {
  */
 function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	let index = 0;
-	// acceder a la anterior fiber (si la hay)
+
+	// access the previous fiber (if it exists)
 	let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
 	let prevSibling = null;
 
@@ -306,7 +312,7 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 
 		const sameType = oldFiber && element && element.type == oldFiber.type;
 
-		// si es el mismo tipo se actualiza
+		// if same type, we update
 		if (sameType) {
 			newFiber = {
 				type: oldFiber.type,
@@ -318,7 +324,7 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 			};
 		}
 
-		// si existe nuevo elemento pero el tipo no coincide o no existe se crea
+		// if type is different, we create a new element
 		if (element && !sameType) {
 			newFiber = {
 				type: element.type,
@@ -330,19 +336,21 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 			};
 		}
 
-		// si existe elemento anterior pero el tipo no coincide se elimina
+		// if there is an old fiber but the type is different, we delete it
 		if (oldFiber && !sameType) {
 			oldFiber.effectTag = "DELETION";
 			deletions.push(oldFiber);
 		}
 
-		// avanzar en la lista de hijos, puede ser que no exista
+		// advance in the children list, it may not exist
 		if (oldFiber) {
 			oldFiber = oldFiber.sibling;
 		}
 
+		// if it's the first child, we set it as the child of the wip fiber
 		if (index === 0) {
 			wipFiber.child = newFiber;
+		// if not the first child, we set it as the sibling of the previous sibling
 		} else if (element) {
 			prevSibling.sibling = newFiber;
 		}

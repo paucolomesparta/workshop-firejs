@@ -6,6 +6,7 @@ import type {
 	FireElementType,
 	FunctionComponent,
 	Hook,
+	InternalProps,
 	JSXElement,
 	Props,
 } from "./types.js";
@@ -45,7 +46,7 @@ function createTextElement(text: string) {
 function createDom(fiber: Fiber) {
 	const dom =
 		fiber.type == "TEXT_ELEMENT"
-			? document.createTextNode("")
+			? document.createTextNode(fiber.props.nodeValue)
 			: document.createElement(fiber.type as string);
 
 	updateDom(dom, {}, fiber.props);
@@ -53,7 +54,7 @@ function createDom(fiber: Fiber) {
 	return dom;
 }
 
-function isEvent(key: string) {
+function isEventHandler(key: string) {
 	return key.startsWith("on");
 }
 
@@ -62,7 +63,7 @@ function getEventName(handler: string) {
 }
 
 function isProperty(key: string) {
-	return key !== "children" && !isEvent(key) && isPropValid(key);
+	return key !== "children" && !isEventHandler(key) && isPropValid(key);
 }
 
 function isNew(prev: Props, next: Props) {
@@ -73,10 +74,10 @@ function isGone(next: Props) {
 	return (key: string) => !(key in next);
 }
 
-function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
+function updateDom(dom: DOMElement, prevProps: InternalProps, nextProps: InternalProps) {
 	// Handle text content for text nodes
 	if (dom.nodeType === Node.TEXT_NODE) {
-		dom.nodeValue = (nextProps as any).nodeValue || "";
+		dom.nodeValue = nextProps.nodeValue || "";
 		return;
 	}
 
@@ -84,8 +85,8 @@ function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
 
 	// Remove old or changed event listeners
 	Object.keys(prevProps)
-		.filter(isEvent)
-		.filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
+		.filter(isEventHandler)
+		.filter(isNew(prevProps, nextProps))
 		.forEach(name => {
 			const eventType = getEventName(name);
 			htmlElement.removeEventListener(eventType, prevProps[name]);
@@ -109,7 +110,7 @@ function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
 
 	// Add event listeners
 	Object.keys(nextProps)
-		.filter(isEvent)
+		.filter(isEventHandler)
 		.filter(isNew(prevProps, nextProps))
 		.forEach(name => {
 			const eventType = getEventName(name);
@@ -118,9 +119,9 @@ function updateDom(dom: DOMElement, prevProps: Props, nextProps: Props) {
 }
 
 /**
- * 1. eliminar los elementos que se han eliminado
- * 2. añadir los nuevos elementos
- * 3. la root WIP pasa a ser la root actual
+ * 1. remove elements that have been deleted
+ * 2. add new elements
+ * 3. the WIP root becomes the current root
  */
 function commitRoot() {
 	deletions.forEach(commitWork);
@@ -130,12 +131,12 @@ function commitRoot() {
 }
 
 /**
- * 1. buscar el padre del elemento (puede haberse eliminado)
- * 2. depende del tipo de efecto:
- * 	- PLACEMENT: añadir al DOM
- * 	- UPDATE: actualizar el DOM
- * 	- DELETION: eliminar del DOM
- * 3. recorrer hijo y hermano
+ * 1. find the parent element (it may have been deleted)
+ * 2. depending on the effect type:
+ *  - PLACEMENT: add to DOM
+ *  - UPDATE: update the DOM
+ *  - DELETION: remove from DOM
+ * 3. traverse child and sibling
  */
 function commitWork(fiber: Fiber) {
 	if (!fiber) {
@@ -169,8 +170,8 @@ function commitDeletion(fiber: Fiber, domParent: DOMElement) {
 }
 
 /**
- * 1. se crea la root fiber
- * 2. se crea la unidad de trabajo
+ * 1. create the root fiber
+ * 2. create the work unit
  */
 function render(element: JSXElement, container: DOMElement) {
 	wipRoot = {
@@ -185,8 +186,8 @@ function render(element: JSXElement, container: DOMElement) {
 }
 
 let nextUnitOfWork = null;
-let currentRoot = null;
-let wipRoot = null;
+let currentRoot: Fiber = null;
+let wipRoot: Fiber = null;
 let deletions = null;
 
 /**
@@ -209,9 +210,9 @@ function workLoop(deadline: IdleDeadline) {
 requestIdleCallback(workLoop);
 
 /**
- * 1. añadir elemento al DOM
- * 2. crear los hijos del elemento
- * 3. seleccionar la siguiente unidad de trabajo
+ * 1. add element to DOM
+ * 2. create element's children
+ * 3. select next work unit
  */
 function performUnitOfWork(fiber: Fiber) {
 	if (isFunctionComponent(fiber.type)) {
@@ -235,9 +236,9 @@ let wipFiber: Fiber = null;
 let hookIndex: number = null;
 
 /**
- * 1. se crea la fiber WIP
- * 2. se ejecuta la función del componente
- * 3. reconciliar los hijos
+ * 1. create the WIP fiber
+ * 2. execute the component function
+ * 3. reconcile children
  */
 function updateFunctionComponent(fiber: Fiber) {
 	wipFiber = fiber;
@@ -276,9 +277,9 @@ function useState<T>(initial: T = null) {
 }
 
 /**
- * Para elementos del DOM:
- * 1. crear el elemento
- * 2. reconciliar los hijos
+ * For DOM elements:
+ * 1. create the element
+ * 2. reconcile children
  */
 function updateHostComponent(fiber: Fiber) {
 	if (!fiber.dom) {
@@ -288,10 +289,10 @@ function updateHostComponent(fiber: Fiber) {
 }
 
 /**
- * para cada hijo del elemento:
- * 1. recorrer en preorden
- * 2. comparar con anterior
- * 3. crear nueva fiber
+ * for each child of the element:
+ * 1. traverse in preorder
+ * 2. compare with previous
+ * 3. create new fiber
  */
 function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	let index = 0;

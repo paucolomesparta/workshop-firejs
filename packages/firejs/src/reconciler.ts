@@ -17,20 +17,16 @@ export function isFunctionComponent<P extends Props = Props>(
 	return element instanceof Function;
 }
 
+// 1. BASIC ELEMENT CREATION - Implement first to understand JSX transformation
 function createElement(
 	type: FireElementType,
 	props: Props,
 	...children: FireElement[]
 ) {
-	return {
-		type,
-		props: {
-			...props,
-			children: children.flat().map(child =>
-				typeof child === "string" ? createTextElement(child) : child,
-			),
-		},
-	};
+	// TODO: Return an object with type and props
+	// - Spread props
+	// - Add children to props, flattening array and converting strings to text elements
+	// - Use createTextElement for string children
 }
 
 function createTextElement(text: string) {
@@ -43,15 +39,13 @@ function createTextElement(text: string) {
 	};
 }
 
+// 2. DOM MANIPULATION - Implement second to understand how elements become real DOM
 function createDom(fiber: Fiber) {
-	const dom =
-		fiber.type == "TEXT_ELEMENT"
-			? document.createTextNode(fiber.props.nodeValue)
-			: document.createElement(fiber.type as string);
-
-	updateDom(dom, {}, fiber.props);
-
-	return dom;
+	// TODO: Create actual DOM node from fiber
+	// - Handle TEXT_ELEMENT case (createTextNode)
+	// - Handle regular elements (createElement)
+	// - Call updateDom to set initial properties
+	// - Return the DOM node
 }
 
 function isEventHandler(key: string) {
@@ -74,6 +68,7 @@ function isGone(next: Props) {
 	return (key: string) => !(key in next);
 }
 
+// COMMIT CHANGES TO DOM - syncronous
 function updateDom(dom: DOMElement, prevProps: InternalProps, nextProps: InternalProps) {
 	// Handle text content for text nodes
 	if (dom.nodeType === Node.TEXT_NODE) {
@@ -118,51 +113,26 @@ function updateDom(dom: DOMElement, prevProps: InternalProps, nextProps: Interna
 		});
 }
 
-/**
- * 1. remove elements that have been deleted
- * 2. add new elements
- * 3. the WIP root becomes the current root
- */
 function commitRoot() {
-	deletions.forEach(commitWork);
-	commitWork(wipRoot.child);
-	currentRoot = wipRoot;
-	wipRoot = null;
+	// TODO: Apply all changes to the real DOM
+	// - Process deletions first
+	// - Process the work-in-progress tree
+	// - Update currentRoot reference
+	// - Clear wipRoot
 }
 
-/**
- * 1. find the parent element (it may have been deleted)
- * 2. depending on the effect type:
- *  - PLACEMENT: add to DOM
- *  - UPDATE: update the DOM
- *  - DELETION: remove from DOM
- * 3. traverse child and sibling
- */
+// 6. COMMIT PHASE - Implement after reconciliation to apply changes to DOM
 function commitWork(fiber: Fiber) {
-	if (!fiber) {
-		return;
-	}
-
-	// postorder traversal
-	// process children first, then siblings, then parent
-	let domParentFiber = fiber.parent;
-	while (!domParentFiber.dom) {
-		domParentFiber = domParentFiber.parent;
-	}
-	const domParent = domParentFiber.dom;
-
-	if (fiber.effectTag === "PLACEMENT" && fiber.dom != null) {
-		domParent.appendChild(fiber.dom);
-	} else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
-		updateDom(fiber.dom, fiber.alternate.props, fiber.props);
-	} else if (fiber.effectTag === "DELETION") {
-		commitDeletion(fiber, domParent);
-	}
-
-	commitWork(fiber.child);
-	commitWork(fiber.sibling);
+	// TODO: Recursively commit changes to DOM (POSTORDER traversal)
+	// - Find parent DOM node (may need to traverse up for function components)
+	// - Handle different effect tags:
+	//   * PLACEMENT: appendChild to DOM
+	//   * UPDATE: call updateDom
+	//   * DELETION: call commitDeletion
+	// - Recursively commit child and sibling
 }
 
+// delete DOM nodes in postorder traversal
 function commitDeletion(fiber: Fiber, domParent: DOMElement) {
 	if (fiber.dom) {
 		domParent.removeChild(fiber.dom);
@@ -171,20 +141,14 @@ function commitDeletion(fiber: Fiber, domParent: DOMElement) {
 	}
 }
 
-/**
- * 1. create the root fiber
- * 2. create the work unit
- */
+// 3. BASIC RENDERING - Implement third to start the fiber tree
 function render(element: JSXElement, container: DOMElement) {
-	wipRoot = {
-		dom: container,
-		props: {
-			children: [element],
-		},
-		alternate: currentRoot,
-	};
-	deletions = [];
-	nextUnitOfWork = wipRoot;
+	// TODO: Initialize the fiber tree and start work
+	// - Create root fiber with container as DOM
+	// - Set props with element as child
+	// - Set alternate to currentRoot
+	// - Initialize deletions array
+	// - Set nextUnitOfWork to start the work loop
 }
 
 let nextUnitOfWork = null;
@@ -192,65 +156,55 @@ let currentRoot: Fiber = null;
 let wipRoot: Fiber = null;
 let deletions = null;
 
-/**
- *
- */
+// 4. WORK SCHEDULING - Implement fourth to understand time slicing
 function workLoop(deadline: IdleDeadline) {
-	let shouldYield = false;
-	while (nextUnitOfWork && !shouldYield) {
-		nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
-		shouldYield = deadline.timeRemaining() < 1;
-	}
-
-	if (!nextUnitOfWork && wipRoot) {
-		commitRoot();
-	}
-
-	requestIdleCallback(workLoop);
+	// TODO: Perform work units while time remains
+	// - Loop while there's work and time remaining
+	// - Call performUnitOfWork and get next unit
+	// - Yield when time is up (< 1ms remaining)
+	// - Commit when all work is done
+	// - Schedule next work loop
 }
 
-requestIdleCallback(workLoop);
+// TODO: Start the work loop
 
-/**
- * 1. add element to DOM
- * 2. create element's children
- * 3. select next work unit
- */
+
+// 5. WORK UNITS - Implement fifth to understand preorder traversal and fiber linking
+
 function performUnitOfWork(fiber: Fiber) {
-	if (isFunctionComponent(fiber.type)) {
-		updateFunctionComponent(fiber);
-	} else {
-		updateHostComponent(fiber);
-	}
+	// TODO: update the fiber
+	// - if function component, invoke updateFunctionComponent
+	// - if host component, invoke updateHostComponent
+
 	if (fiber.child) {
 		return fiber.child;
 	}
 
 	// preorder traversal
 	// process parent first, then siblings, then children
-	let nextFiber = fiber;
-	while (nextFiber) {
-		if (nextFiber.sibling) {
-			return nextFiber.sibling;
-		}
-		nextFiber = nextFiber.parent;
-	}
+	// TODO: return next unit of work
+	// - if there is a child, return it
+	// - if there is a sibling, return it
+	// - if there is a parent, return it
+	// - if there is no more work, return null
 }
 
 let wipFiber: Fiber = null;
 let hookIndex: number = null;
 
-/**
- * 1. create the WIP fiber
- * 2. execute the component function
- * 3. reconcile children
- */
+// 7. FUNCTION COMPONENTS - Implement after basic rendering works
 function updateFunctionComponent(fiber: Fiber) {
-	wipFiber = fiber;
-	hookIndex = 0;
-	wipFiber.hooks = [];
-	const children = [(fiber.type as Function)(fiber.props)];
-	reconcileChildren(fiber, children);
+	// TODO: Handle function components
+	// - Set up hook context (wipFiber, hookIndex, hooks array)
+	// - Call the function component with props to get children
+	// - Reconcile the children
+}
+
+// 3. HOST COMPONENTS - Implement with basic rendering
+function updateHostComponent(fiber: Fiber) {
+	// TODO: Handle DOM elements
+	// - Create DOM node if it doesn't exist
+	// - Reconcile children
 }
 
 function useState<T>(initial: T = null) {
@@ -266,39 +220,20 @@ function useState<T>(initial: T = null) {
 	});
 
 	const setState = action => {
-		hook.queue.push(action);
-		wipRoot = {
-			dom: currentRoot.dom,
-			props: currentRoot.props,
-			alternate: currentRoot,
-		};
-		nextUnitOfWork = wipRoot;
-		deletions = [];
+		// TODO: create a new fiber (unit of work)
+		// - push state to the queue
+		// - set wipRoot to the current root
+		// - set nextUnitOfWork to wipRoot
+		// - set deletions to an empty array
 	};
 
 	wipFiber.hooks.push(hook);
 	hookIndex++;
+
 	return [hook.state, setState];
 }
 
-/**
- * For DOM elements:
- * 1. create the element
- * 2. reconcile children
- */
-function updateHostComponent(fiber: Fiber) {
-	if (!fiber.dom) {
-		fiber.dom = createDom(fiber);
-	}
-	reconcileChildren(fiber, fiber.props.children);
-}
-
-/**
- * for each child of the element:
- * 1. traverse in preorder
- * 2. compare with previous
- * 3. create new fiber
- */
+// 5. RECONCILIATION - Implement fifth to understand diffing algorithm
 function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	let index = 0;
 
@@ -306,41 +241,16 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
 	let prevSibling = null;
 
+	// linear traversal
 	while (index < elements.length || oldFiber != null) {
 		const element = elements[index];
 		let newFiber: Fiber | null = null;
 
-		const sameType = oldFiber && element && element.type == oldFiber.type;
-
-		// if same type, we update
-		if (sameType) {
-			newFiber = {
-				type: oldFiber.type,
-				props: element.props,
-				dom: oldFiber.dom,
-				parent: wipFiber,
-				alternate: oldFiber,
-				effectTag: "UPDATE",
-			};
-		}
-
-		// if type is different, we create a new element
-		if (element && !sameType) {
-			newFiber = {
-				type: element.type,
-				props: element.props,
-				dom: null,
-				parent: wipFiber,
-				alternate: null,
-				effectTag: "PLACEMENT",
-			};
-		}
-
-		// if there is an old fiber but the type is different, we delete it
-		if (oldFiber && !sameType) {
-			oldFiber.effectTag = "DELETION";
-			deletions.push(oldFiber);
-		}
+		// TODO: update effect
+		// - check if old fiber exists and is same type
+		// - if same type, we update
+		// - if type is different, we create a new element
+		// - if there is an old fiber but the type is different, we delete it
 
 		// advance in the children list, it may not exist
 		if (oldFiber) {

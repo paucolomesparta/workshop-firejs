@@ -233,8 +233,19 @@ function commitRoot() {
 // 10. COMMIT WORK - Apply changes to DOM (postorder traversal)
 // This is where the virtual changes become real DOM changes
 function commitWork(fiber: Fiber) {
+	if (!fiber) {
+		return;
+	}
+
+	// postorder traversal
+	// process children first, then siblings, then parent
+	let domParentFiber = fiber.parent;
+	while (!domParentFiber.dom) {
+		domParentFiber = domParentFiber.parent;
+	}
+	const domParent = domParentFiber.dom;
+
 	// TODO: Recursively commit changes to DOM (POSTORDER traversal)
-	// - Find parent DOM node (may need to traverse up for function components)
 	// - Handle different effect tags:
 	//   * PLACEMENT: appendChild to DOM
 	//   * UPDATE: call updateDom

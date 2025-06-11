@@ -17,7 +17,8 @@ export function isFunctionComponent<P extends Props = Props>(
 	return element instanceof Function;
 }
 
-// 1. BASIC ELEMENT CREATION - Implement first to understand JSX transformation
+// 1. BASIC ELEMENT CREATION - Start here to understand JSX transformation
+// This is the foundation - how JSX becomes our internal elements
 function createElement(
 	type: FireElementType,
 	props: Props,
@@ -39,7 +40,8 @@ function createTextElement(text: string) {
 	};
 }
 
-// 2. DOM MANIPULATION - Implement second to understand how elements become real DOM
+// 2. DOM CREATION - Learn how our elements become real DOM nodes
+// Essential for understanding the connection between virtual and real DOM
 function createDom(fiber: Fiber) {
 	// TODO: Create actual DOM node from fiber
 	// - Handle TEXT_ELEMENT case (createTextNode)
@@ -68,7 +70,7 @@ function isGone(next: Props) {
 	return (key: string) => !(key in next);
 }
 
-// COMMIT CHANGES TO DOM - syncronous
+// DOM UPDATE HELPER - Already implemented (used by createDom and commitWork)
 function updateDom(dom: DOMElement, prevProps: InternalProps, nextProps: InternalProps) {
 	// Handle text content for text nodes
 	if (dom.nodeType === Node.TEXT_NODE) {
@@ -113,35 +115,8 @@ function updateDom(dom: DOMElement, prevProps: InternalProps, nextProps: Interna
 		});
 }
 
-function commitRoot() {
-	// TODO: Apply all changes to the real DOM
-	// - Process deletions first
-	// - Process the work-in-progress tree
-	// - Update currentRoot reference
-	// - Clear wipRoot
-}
-
-// 6. COMMIT PHASE - Implement after reconciliation to apply changes to DOM
-function commitWork(fiber: Fiber) {
-	// TODO: Recursively commit changes to DOM (POSTORDER traversal)
-	// - Find parent DOM node (may need to traverse up for function components)
-	// - Handle different effect tags:
-	//   * PLACEMENT: appendChild to DOM
-	//   * UPDATE: call updateDom
-	//   * DELETION: call commitDeletion
-	// - Recursively commit child and sibling
-}
-
-// delete DOM nodes in postorder traversal
-function commitDeletion(fiber: Fiber, domParent: DOMElement) {
-	if (fiber.dom) {
-		domParent.removeChild(fiber.dom);
-	} else {
-		commitDeletion(fiber.child, domParent);
-	}
-}
-
-// 3. BASIC RENDERING - Implement third to start the fiber tree
+// 3. INITIAL RENDER - Set up the fiber tree and start the work
+// This is where React begins - creating the root fiber
 function render(element: JSXElement, container: DOMElement) {
 	// TODO: Initialize the fiber tree and start work
 	// - Create root fiber with container as DOM
@@ -151,12 +126,31 @@ function render(element: JSXElement, container: DOMElement) {
 	// - Set nextUnitOfWork to start the work loop
 }
 
+// Global state for the reconciler
 let nextUnitOfWork = null;
 let currentRoot: Fiber = null;
 let wipRoot: Fiber = null;
 let deletions = null;
 
-// 4. WORK SCHEDULING - Implement fourth to understand time slicing
+// 4. HOST COMPONENTS - Handle regular DOM elements
+// Implement this early to get basic rendering working
+function updateHostComponent(fiber: Fiber) {
+	// TODO: Handle DOM elements
+	// - Create DOM node if it doesn't exist
+	// - Reconcile children
+}
+
+// 5. FUNCTION COMPONENTS - Handle components that are functions
+// This introduces the concept of components as functions
+function updateFunctionComponent(fiber: Fiber) {
+	// TODO: Handle function components
+	// - Set up hook context (wipFiber, hookIndex, hooks array)
+	// - Call the function component with props to get children
+	// - Reconcile the children
+}
+
+// 6. WORK SCHEDULING - The heart of Fiber's time slicing
+// This is what makes React interruptible and non-blocking
 function workLoop(deadline: IdleDeadline) {
 	// TODO: Perform work units while time remains
 	// - Loop while there's work and time remaining
@@ -168,9 +162,8 @@ function workLoop(deadline: IdleDeadline) {
 
 // TODO: Start the work loop
 
-
-// 5. WORK UNITS - Implement fifth to understand preorder traversal and fiber linking
-
+// 7. WORK UNITS - The preorder traversal that builds the fiber tree
+// This shows how React walks through components systematically
 function performUnitOfWork(fiber: Fiber) {
 	// TODO: update the fiber
 	// - if function component, invoke updateFunctionComponent
@@ -189,51 +182,8 @@ function performUnitOfWork(fiber: Fiber) {
 	// - if there is no more work, return null
 }
 
-let wipFiber: Fiber = null;
-let hookIndex: number = null;
-
-// 7. FUNCTION COMPONENTS - Implement after basic rendering works
-function updateFunctionComponent(fiber: Fiber) {
-	// TODO: Handle function components
-	// - Set up hook context (wipFiber, hookIndex, hooks array)
-	// - Call the function component with props to get children
-	// - Reconcile the children
-}
-
-// 3. HOST COMPONENTS - Implement with basic rendering
-function updateHostComponent(fiber: Fiber) {
-	// TODO: Handle DOM elements
-	// - Create DOM node if it doesn't exist
-	// - Reconcile children
-}
-
-function useState<T>(initial: T = null) {
-	const oldHook = wipFiber?.alternate?.hooks?.[hookIndex];
-	const hook: Hook = {
-		state: oldHook ? oldHook.state : initial,
-		queue: [],
-	};
-
-	const actions = oldHook ? oldHook.queue : [];
-	actions.forEach(action => {
-		hook.state = action(hook.state);
-	});
-
-	const setState = action => {
-		// TODO: create a new fiber (unit of work)
-		// - push state to the queue
-		// - set wipRoot to the current root
-		// - set nextUnitOfWork to wipRoot
-		// - set deletions to an empty array
-	};
-
-	wipFiber.hooks.push(hook);
-	hookIndex++;
-
-	return [hook.state, setState];
-}
-
-// 5. RECONCILIATION - Implement fifth to understand diffing algorithm
+// 8. RECONCILIATION - The diffing algorithm that makes React fast
+// This is the core of React's performance - comparing old vs new
 function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 	let index = 0;
 
@@ -268,6 +218,71 @@ function reconcileChildren(wipFiber: Fiber, elements: JSXElement[]) {
 		prevSibling = newFiber;
 		index++;
 	}
+}
+
+// 9. COMMIT ROOT - Start the commit phase (applying all changes)
+// This transitions from the render phase to the commit phase
+function commitRoot() {
+	// TODO: Apply all changes to the real DOM
+	// - Process deletions first
+	// - Process the work-in-progress tree
+	// - Update currentRoot reference
+	// - Clear wipRoot
+}
+
+// 10. COMMIT WORK - Apply changes to DOM (postorder traversal)
+// This is where the virtual changes become real DOM changes
+function commitWork(fiber: Fiber) {
+	// TODO: Recursively commit changes to DOM (POSTORDER traversal)
+	// - Find parent DOM node (may need to traverse up for function components)
+	// - Handle different effect tags:
+	//   * PLACEMENT: appendChild to DOM
+	//   * UPDATE: call updateDom
+	//   * DELETION: call commitDeletion
+	// - Recursively commit child and sibling
+}
+
+// 11. COMMIT DELETION HELPER - Already implemented (postorder traversal)
+function commitDeletion(fiber: Fiber, domParent: DOMElement) {
+	if (fiber.dom) {
+		domParent.removeChild(fiber.dom);
+	} else {
+		commitDeletion(fiber.child, domParent);
+	}
+}
+
+// Global state for hooks
+let wipFiber: Fiber = null;
+let hookIndex: number = null;
+
+
+
+// 12. HOOKS - The useState hook for state management
+// This is the most complex part - how hooks maintain state
+function useState<T>(initial: T = null) {
+	const oldHook = wipFiber?.alternate?.hooks?.[hookIndex];
+	const hook: Hook = {
+		state: oldHook ? oldHook.state : initial,
+		queue: [],
+	};
+
+	const actions = oldHook ? oldHook.queue : [];
+	actions.forEach(action => {
+		hook.state = action(hook.state);
+	});
+
+	const setState = action => {
+		// TODO: create a new fiber (unit of work)
+		// - push state to the queue
+		// - set wipRoot to the current root
+		// - set nextUnitOfWork to wipRoot
+		// - set deletions to an empty array
+	};
+
+	wipFiber.hooks.push(hook);
+	hookIndex++;
+
+	return [hook.state, setState];
 }
 
 export { createElement, render, useState };
